@@ -1,12 +1,13 @@
-﻿# life_os
+# life_os
 
-Roy's personal life-systems repo. Private. Holds playbooks, system docs, and methodology artifacts that compound across projects.
+Personal life-systems repo by [Roy Bernheim](https://github.com/royber34). Holds playbooks, system docs, and methodology artifacts that compound across projects — published openly when they generalize.
 
-## Layout
+## Playbooks
 
-- `playbooks/` — shareable methodology playbooks. Each subfolder is self-contained and could be extracted to a separate public repo.
-- (more sections as they're added)
+- **[claude-md-restructure/](playbooks/claude-md-restructure/)** — a methodology for shrinking a bloated Claude Code global `CLAUDE.md` file from a sprawling monolith to a routed, fast, accurate system without losing operational content. Research-grounded, with templates and a phased execution guide.
 
-## Sharing policy
+More playbooks as they're added.
 
-This repo is private. Individual playbooks under `playbooks/` are designed to be shareable — when one is ready for public release, it gets extracted to its own public repo. Don't make this repo public without first auditing every directory for personal/client data.
+## License
+
+MIT.
