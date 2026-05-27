@@ -8,13 +8,13 @@ Budget one to three hours. The audit is the longest single phase of the restruct
 
 For every CLAUDE.md file on your machine, every section gets classified into one of three buckets:
 
-- **KEEP** — it's a standing cross-cutting rule at the right scope. Stays where it is.
-- **MOVE** — it's useful but in the wrong place. Move to a skill, a project CLAUDE.md, a README, or another doc.
-- **DELETE** — it's state, stale, duplicated, or fails the "would removing this cause Claude to make mistakes" test.
+- **KEEP**: it's a standing cross-cutting rule at the right scope. Stays where it is.
+- **MOVE**: it's useful but in the wrong place. Move to a skill, a project CLAUDE.md, a README, or another doc.
+- **DELETE**: it's state, stale, duplicated, or fails the "would removing this cause Claude to make mistakes" test.
 
 Every section gets an explicit verdict. No section gets to remain by default. This is the discipline.
 
-## Discovery — find every CLAUDE.md you have
+## Discovery: find every CLAUDE.md you have
 
 You probably have more CLAUDE.md files than you remember. Discovery is the first move.
 
@@ -50,12 +50,12 @@ A few things to expect:
 
 - A global at `~/.claude/CLAUDE.md` (the one this playbook is mostly about).
 - One or more project-level CLAUDE.mds in your code directories.
-- Auto-memory files at `~/.claude/projects/<some-encoded-path>/memory/MEMORY.md`. These are written by Claude Code itself; they're not the same shape as CLAUDE.md and follow different rules. Note them but don't restructure them — the harness manages them.
+- Auto-memory files at `~/.claude/projects/<some-encoded-path>/memory/MEMORY.md`. These are written by Claude Code itself; they're not the same shape as CLAUDE.md and follow different rules. Note them but don't restructure them; the harness manages them.
 - Possibly orphans: CLAUDE.mds in old project directories you haven't touched in months. These still load when you cd into them. Worth noting.
 
 ## The classification framework
 
-For every section in every file you found, walk through the framework below. The categories overlap a little, and that's fine — assign to the dominant category.
+For every section in every file you found, walk through the framework below. The categories overlap a little, and that's fine; assign to the dominant category.
 
 ### State
 
@@ -69,7 +69,7 @@ For every section in every file you found, walk through the framework below. The
 
 **Verdict:** DELETE from CLAUDE.md. State doesn't belong in a file the model reads on every turn. Move task lists to your actual task tracker. Move project status to project docs. Auto-memory is the right place for transient state (the harness manages it; you don't have to).
 
-**Why:** State decays. The moment it's stale, it's actively misleading — Claude reads it as current truth and acts on outdated information.
+**Why:** State decays. The moment it's stale, it's actively misleading; Claude reads it as current truth and acts on outdated information.
 
 ### Procedures
 
@@ -81,7 +81,7 @@ For every section in every file you found, walk through the framework below. The
 - "How to cut a new release: bump version, tag, push, verify CI, post to changelog"
 - "Database backup procedure for the staging environment"
 
-**Verdict:** MOVE to a skill. Claude Code skills are the right home for procedural content — they're loaded on demand, not on every turn, and they can be parameterized.
+**Verdict:** MOVE to a skill. Claude Code skills are the right home for procedural content; they're loaded on demand, not on every turn, and they can be parameterized.
 
 A 30-line procedure in your global CLAUDE.md costs you 30 lines of context on every conversation, even when you're not running that procedure. The same procedure as a skill costs you one line in the skill index and zero lines in CLAUDE.md until you invoke it.
 
@@ -108,7 +108,7 @@ A 30-line procedure in your global CLAUDE.md costs you 30 lines of context on ev
 - "Never push to a remote without asking."
 - "Use PowerShell syntax on Windows; bash is also available."
 - "Find root causes, not bandaids."
-- "Match scope to the ask — don't refactor things I didn't ask you to touch."
+- "Match scope to the ask; don't refactor things I didn't ask you to touch."
 
 **Verdict:** KEEP at the right scope. Cross-cutting rules go in the global. Project-specific conventions go in the project CLAUDE.md (e.g., "in this repo, all SQL identifiers are snake_case").
 
@@ -120,12 +120,12 @@ A 30-line procedure in your global CLAUDE.md costs you 30 lines of context on ev
 
 **Examples:**
 - "When writing PowerShell here-strings, never indent the closing `'@`."
-- "Don't use `cat >` on a shell — it silently overwrites."
+- "Don't use `cat >` on a shell; it silently overwrites."
 - "For MCP calls into a specific tool, always use the configured account, not the default."
 
 **Verdict:** KEEP, but organize by scope, and prune ruthlessly. Cross-cutting failures (PowerShell syntax) belong in global. Project-specific failures (a particular API quirk) belong in that project's CLAUDE.md. Failures specific to a procedure should live in the skill for that procedure, not in CLAUDE.md.
 
-**Why:** Failure logs are high-signal — they encode mistakes you've already made and want to prevent. But left uncurated, they accumulate forever. Every few months, re-read them and cut the ones that no longer apply (e.g., the underlying tool fixed the bug, or you've internalized the rule and don't need it written down).
+**Why:** Failure logs are high-signal; they encode mistakes you've already made and want to prevent. But left uncurated, they accumulate forever. Every few months, re-read them and cut the ones that no longer apply (e.g., the underlying tool fixed the bug, or you've internalized the rule and don't need it written down).
 
 ## The "triple-duplicate" pattern
 
@@ -135,11 +135,11 @@ Claude Code loads CLAUDE.md files hierarchically: it walks up the directory tree
 
 The triple-duplicate pattern looks like this. You have:
 
-- `~/.claude/CLAUDE.md` — global, contains "Always run tests before committing."
-- `~/code/CLAUDE.md` — top of your code dir, also contains "Always run tests before committing."
-- `~/code/some-project/CLAUDE.md` — same line again.
+- `~/.claude/CLAUDE.md`: global, contains "Always run tests before committing."
+- `~/code/CLAUDE.md`: top of your code dir, also contains "Always run tests before committing."
+- `~/code/some-project/CLAUDE.md`: same line again.
 
-When you cd into `~/code/some-project/`, Claude Code loads all three. The instruction appears three times. Triple-duplicates dilute the rest of the file and waste tokens, and they're surprisingly common — you forget you wrote it at one level and add it again at another.
+When you cd into `~/code/some-project/`, Claude Code loads all three. The instruction appears three times. Triple-duplicates dilute the rest of the file and waste tokens, and they're surprisingly common; you forget you wrote it at one level and add it again at another.
 
 How to find them: after discovery, grep for distinctive phrases across all your CLAUDE.mds.
 
@@ -157,13 +157,13 @@ Pick five or six load-bearing rules from your global and grep each one. If any r
 
 ## Global vs project duplicates
 
-The other common duplication pattern: the same content in the global and in a project file, where the project file was created later as a "just in case" copy. Same fix — pick the right scope, delete the duplicates.
+The other common duplication pattern: the same content in the global and in a project file, where the project file was created later as a "just in case" copy. Same fix: pick the right scope, delete the duplicates.
 
 A useful heuristic: if a rule applies to every project you work on, it's global. If it applies to a single repo, it's project. If you're not sure, ask: "Would I want this rule active when I'm working on something completely unrelated?" If yes, global. If no, project.
 
 ## The audit deliverable
 
-Produce a per-file table. Plain markdown is fine. Don't over-engineer the format — the goal is a working document, not a published artifact.
+Produce a per-file table. Plain markdown is fine. Don't over-engineer the format; the goal is a working document, not a published artifact.
 
 Suggested columns:
 
@@ -175,7 +175,7 @@ Suggested columns:
 | "Match scope to the ask" | `~/.claude/CLAUDE.md` | 50-58 | Standing rule | KEEP | n/a |
 | "PowerShell here-string fix" | `~/.claude/CLAUDE.md` | 600-605 | Failure-log | KEEP | n/a (already global-scoped, applies broadly) |
 
-One row per section. Resist the urge to skip "obvious keeps" — the discipline of explicit verdicts is the point. When you're done, you should be able to look at any line in any of your CLAUDE.md files and point to its row in the table.
+One row per section. Resist the urge to skip "obvious keeps"; the discipline of explicit verdicts is the point. When you're done, you should be able to look at any line in any of your CLAUDE.md files and point to its row in the table.
 
 ## The decision tree
 
@@ -190,6 +190,6 @@ When you're stuck on a section, walk this in order:
 7. **Is it at the right scope?** Global rule in global? Project rule in project? If no, MOVE.
 8. **Else** → KEEP.
 
-Most sections will be classifiable in under thirty seconds with this tree. The hard cases are the ones that pass the mistake test but might be in the wrong file — those are worth more thought, since the wrong-file failure mode (the rule fires when it shouldn't) is often worse than the missing-rule failure mode (the rule doesn't fire when it should).
+Most sections will be classifiable in under thirty seconds with this tree. The hard cases are the ones that pass the mistake test but might be in the wrong file; those are worth more thought, since the wrong-file failure mode (the rule fires when it shouldn't) is often worse than the missing-rule failure mode (the rule doesn't fire when it should).
 
 When the audit is complete and you have a table covering every file, you're ready to back up, build the skills you flagged, move the project content, and stage the new global. Those phases are mechanical compared to this one.

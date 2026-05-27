@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# restore.sh — hash-verified restore of CLAUDE.md and related config files
+# restore.sh: hash-verified restore of CLAUDE.md and related config files
 #
 # Usage:
 #   ./restore.sh                  # restore any files that are missing or differ from backup
@@ -11,7 +11,7 @@
 #   - For each pair, compares SHA256 of backup vs. target.
 #   - If target is missing OR matches backup, restores silently (idempotent).
 #   - If target exists AND differs from backup, prompts before overwriting.
-#   - The mapping list below is the source of truth — edit it to suit your setup.
+#   - The mapping list below is the source of truth; edit it to suit your setup.
 #
 # Works on Linux (sha256sum) and macOS (shasum -a 256).
 

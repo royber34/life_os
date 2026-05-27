@@ -1,4 +1,4 @@
-# restore.ps1 — hash-verified restore of CLAUDE.md and related config files
+# restore.ps1: hash-verified restore of CLAUDE.md and related config files
 #
 # Usage:
 #   .\restore.ps1                # restore any files that are missing or differ from backup
@@ -10,7 +10,7 @@
 #   - For each pair, compares SHA256 of backup vs. target.
 #   - If target is missing OR matches backup, restores silently (idempotent).
 #   - If target exists AND differs from backup, prompts before overwriting.
-#   - The mapping list below is the source of truth — edit it to suit your setup.
+#   - The mapping list below is the source of truth; edit it to suit your setup.
 #
 # Why hash-verify: prevents stomping on a file the user has edited since the
 # backup was taken. The prompt is the last line of defense against data loss.

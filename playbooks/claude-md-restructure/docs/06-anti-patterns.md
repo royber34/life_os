@@ -1,8 +1,8 @@
-# 06 — Anti-patterns
+# 06: Anti-patterns
 
 The failure modes you should expect, organized by the phase that produces them. Each one names the mistake, the symptom that gives it away, and the right way to do it instead.
 
-If you've read the previous docs and you're tempted to skip this one because "you wouldn't make these mistakes" — that's the first anti-pattern.
+If you've read the previous docs and you're tempted to skip this one because "you wouldn't make these mistakes", that's the first anti-pattern.
 
 ---
 
@@ -10,7 +10,7 @@ If you've read the previous docs and you're tempted to skip this one because "yo
 
 ### "I'll just delete some stuff"
 
-The mistake: skipping the audit, the backup, and the staging — going straight to editing the live global file because you "know what's bloated."
+The mistake: skipping the audit, the backup, and the staging, going straight to editing the live global file because you "know what's bloated."
 
 Symptom: things break a few sessions later in ways you can't trace. You can't tell whether the breakage is from a deletion (which one?) or unrelated drift. No backup means no rollback.
 
@@ -20,7 +20,7 @@ Right way: every change goes through the seven-phase workflow even when it feels
 
 The mistake: the file grew because every time something went wrong, you added a rule to prevent recurrence. There was no rule for what should *not* be in the file, so the file only grew.
 
-Symptom: a 600-line global file where most lines are reactive — added in response to a single incident, never re-examined.
+Symptom: a 600-line global file where most lines are reactive, added in response to a single incident, never re-examined.
 
 Right way: pair "add a rule" with "what does this rule replace, or what test does it have to pass to stay?" If you can't answer, the rule doesn't go in.
 
@@ -58,11 +58,11 @@ Right way: the test is binary. If you can't construct a concrete mistake Claude 
 
 ### Missing the triple-duplicate pattern
 
-The mistake: not noticing that the same rule appears in three places — once as a global bullet, once inside a project `CLAUDE.md`, and once captured in auto-memory.
+The mistake: not noticing that the same rule appears in three places: once as a global bullet, once inside a project `CLAUDE.md`, and once captured in auto-memory.
 
 Symptom: every session loads the same rule three times. Claude doesn't behave better because of it, but your context bill goes up.
 
-Right way: during the audit, search every loaded file for each rule. Pick one home for it — usually the most specific one (project file > global) — and delete the others.
+Right way: during the audit, search every loaded file for each rule. Pick one home for it (usually the most specific one, project file > global), and delete the others.
 
 ---
 
@@ -80,7 +80,7 @@ Right way: hash everything at backup time. Hash again at restore time. Compare. 
 
 The mistake: writing the restore script, never running it, and assuming it works because the syntax looks right.
 
-Symptom: the day you need to restore, the script fails on an edge case you didn't anticipate — a path with a space, a missing parent directory, a prompt that hangs because it's running non-interactively.
+Symptom: the day you need to restore, the script fails on an edge case you didn't anticipate: a path with a space, a missing parent directory, a prompt that hangs because it's running non-interactively.
 
 Right way: test the restore against a drifted file before you start the restructure. See `04-backup-and-safety.md`.
 
@@ -90,7 +90,7 @@ Right way: test the restore against a drifted file before you start the restruct
 
 ### Vague descriptions
 
-The mistake: writing a skill description that's accurate but not invocable. "Helps with deployment" — Claude has no way to map a user's actual phrasing ("ship the new version", "deploy to staging", "push the build") onto that.
+The mistake: writing a skill description that's accurate but not invocable. "Helps with deployment": Claude has no way to map a user's actual phrasing ("ship the new version", "deploy to staging", "push the build") onto that.
 
 Symptom: you wrote a great skill, the runbook is solid, and it never fires because no user phrasing matches the description.
 
@@ -98,7 +98,7 @@ Right way: in the description, name the triggers in the words a user would actua
 
 ### Skills that are too narrow
 
-The mistake: making one skill per runbook. You end up with seven skills covering the same area, with overlapping triggers — Claude picks the wrong one, or doesn't pick any because the descriptions blur together.
+The mistake: making one skill per runbook. You end up with seven skills covering the same area, with overlapping triggers; Claude picks the wrong one, or doesn't pick any because the descriptions blur together.
 
 Symptom: a skills directory full of single-runbook skills with names like `deploy-staging`, `deploy-prod`, `rollback-staging`, `rollback-prod`, `check-deploy-status`.
 
@@ -112,13 +112,13 @@ Right way: group related runbooks into one skill. `release-ops` holds deploy, ro
 
 The mistake: pasting cross-cutting rules from the global file into every project `CLAUDE.md` "for redundancy."
 
-Symptom: every session loads each rule twice — once from global, once from project. The duplication doesn't help Claude (the second copy is ignored or, worse, conflicts subtly) but it does add noise.
+Symptom: every session loads each rule twice: once from global, once from project. The duplication doesn't help Claude (the second copy is ignored or, worse, conflicts subtly) but it does add noise.
 
 Right way: project files hold project-specific content only. Cross-cutting rules live in the global, full stop.
 
 ### Reference content in CLAUDE.md instead of project README
 
-The mistake: putting long-form reference material — architecture explanations, glossaries, full API descriptions — inside the project `CLAUDE.md`.
+The mistake: putting long-form reference material (architecture explanations, glossaries, full API descriptions) inside the project `CLAUDE.md`.
 
 Symptom: project `CLAUDE.md` is several thousand words. Every session that enters the project tree loads the whole thing, even sessions that don't need it.
 
@@ -154,9 +154,9 @@ Right way: open a brand-new session for verification. Run the verification promp
 
 ### Ignoring auto-memory drift
 
-The mistake: the new global file is clean and minimal, but auto-memory still contains rules from when the global was bloated — some of which now contradict the new global.
+The mistake: the new global file is clean and minimal, but auto-memory still contains rules from when the global was bloated, some of which now contradict the new global.
 
-Symptom: Claude behaves inconsistently — it follows the new global most of the time, but occasionally cites an auto-memory rule that contradicts it.
+Symptom: Claude behaves inconsistently. It follows the new global most of the time, but occasionally cites an auto-memory rule that contradicts it.
 
 Right way: review auto-memory files after the swap. Prune anything that's now duplicated or contradicted by the new global.
 
@@ -170,7 +170,7 @@ The mistake: treating the restructure as a one-shot project. After it ships, the
 
 Symptom: six months later, the file is bloated again. Same problem, same restructure needed.
 
-Right way: failure-log discipline as a permanent practice. Every correction that'll likely recur prompts a question — "should this go in the global, a project file, or stay as a one-off?" Most go in a project file or get absorbed into an existing skill. A few belong in the global.
+Right way: failure-log discipline as a permanent practice. Every correction that'll likely recur prompts a question: "should this go in the global, a project file, or stay as a one-off?" Most go in a project file or get absorbed into an existing skill. A few belong in the global.
 
 ### Assuming the work is "done"
 
