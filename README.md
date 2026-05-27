@@ -1,6 +1,6 @@
 # life_os
 
-Personal life-systems repo by [Roy Bernheim](https://github.com/royber34). Holds playbooks, system docs, and methodology artifacts that compound across projects, published openly when they generalize.
+Personal and business life-systems repo by [Roy Bernheim](https://github.com/royber34). Holds playbooks, system docs, and methodology artifacts that compound across projects, published openly when they generalize.
 
 ## Playbooks
 
