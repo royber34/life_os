@@ -1,6 +1,6 @@
 ---
 name: claude-md-restructure
-description: Guided restructure of a bloated Claude Code global CLAUDE.md, applying the full methodology end to end. Use when the user says "restructure my CLAUDE.md", "shrink my CLAUDE.md", "audit my CLAUDE.md", "my CLAUDE.md is bloated", "my Claude Code feels slow", "my CLAUDE.md has grown too big", "fix my CLAUDE.md", "apply the CLAUDE.md restructure playbook", or "sharpen my CLAUDE.md". Walks the user through seven phases (research, audit, backup, build skills, move project content, stage proposed, atomic swap) with safety gates at each step. The user makes all judgment calls; the skill executes the mechanical work.
+description: Guided sharpening of a bloated Claude Code global CLAUDE.md, applying the full methodology end to end. Use when the user says "sharpen my CLAUDE.md", "my CLAUDE.md is bloated", "restructure my CLAUDE.md", "shrink my CLAUDE.md", "audit my CLAUDE.md", "my Claude Code feels slow", "my CLAUDE.md has grown too big", "fix my CLAUDE.md", or "apply the CLAUDE.md sharpening playbook". Walks the user through seven phases (research, audit, backup, build skills, move project content, stage proposed, atomic swap) with safety gates at each step. The user makes all judgment calls; the skill executes the mechanical work.
 ---
 
 # CLAUDE.md Restructure (guided methodology)

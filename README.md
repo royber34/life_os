@@ -4,7 +4,7 @@ Personal and business life-systems repo by [Roy Bernheim](https://github.com/roy
 
 ## Playbooks
 
-- **[claude-md-restructure/](playbooks/claude-md-restructure/)**: a methodology for shrinking a bloated Claude Code global `CLAUDE.md` file from a sprawling monolith to a routed, fast, accurate system without losing operational content. Research-grounded, with templates and a phased execution guide.
+- **[claude-md-restructure/](playbooks/claude-md-restructure/)**: the approach I've been using to keep my Claude Code `CLAUDE.md` sharp instead of letting it bloat into something Claude itself starts to ignore. Research-grounded, with templates, docs, and an installable skill.
 
 More playbooks as they're added.
 

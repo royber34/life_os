@@ -1,6 +1,16 @@
-# The CLAUDE.md Restructure Playbook
+# Sharpening your CLAUDE.md
 
-A methodology for shrinking a bloated Claude Code global memory file from a sprawling monolith down to a routed, fast, accurate system, without losing any operational content.
+CLAUDE.md is the instructions file Claude Code reads at the start of every session: how you work, what conventions you use, what mistakes you don't want repeated. Over time it tends to accumulate. A rule here, a runbook there, project context, conventions, footguns turned into "never do this again" lines. After a few months it can balloon into something Claude itself starts to ignore.
+
+This repo shares the approach I've been using to keep mine sharp: the methodology I've landed on so far, the research that informed it, the templates, the docs, and an installable skill that walks you through the same process on your own setup. Doing this made Claude noticeably better for me. Whether it generalizes is your call; sharing what's worked so far in case any of it lands for you.
+
+---
+
+## Two ways to use this
+
+**Read and get inspired.** The principles, research, methodology, and templates below stand on their own. If your CLAUDE.md isn't heavy yet (or you're new to Claude Code), the patterns might be useful prevention, and the research is worth knowing. Absorb what fits and ignore the rest.
+
+**Install the skill and run it on your setup.** When your CLAUDE.md does feel heavy, install the skill (one PowerShell or bash line in [Quick start](#quick-start-install-the-skill) below). It walks you through the same process I went through, with safety gates at each step. You make the judgment calls; the skill handles the mechanical work (discovery, hash-verified backup, atomic swap, fresh-session verification).
 
 ---
 
@@ -16,7 +26,7 @@ Three things are happening simultaneously:
 
 The cost compounds: combined with MCP tool schemas (25–50k tokens for a typical setup), a 10k-token global CLAUDE.md consumes ~30% of a 200k context window before any actual work begins.
 
-This playbook documents how to fix it safely, without losing operational content, with verification at every step.
+This is the approach I've been taking to address it, with verification and rollback at each step. Not a definitive answer; what's been working for me so far.
 
 ---
 
@@ -29,7 +39,7 @@ You'll get value from this if any of these are true:
 - Your Claude Code sessions feel slower, less accurate, or more likely to ignore specific rules you've set.
 - You have multiple projects with their own CLAUDE.md files and aren't sure how they should relate.
 - You have procedural runbooks (multi-step recipes) embedded in your CLAUDE.md that load on every session whether relevant or not.
-- You want to fix this but are worried about losing the operational content you've accumulated.
+- You want to address this but are worried about losing the operational content you've accumulated.
 
 This is **not** for you if:
 
@@ -41,7 +51,7 @@ This is **not** for you if:
 
 ## Quick start: install the skill
 
-The methodology in this playbook is also packaged as an installable Claude Code skill that walks you through the seven phases interactively, with safety gates at each step. Treat it as sharpening the pencil: invoke it whenever your CLAUDE.md feels heavy and let it guide you through the restructure end to end.
+The methodology in this playbook is also packaged as an installable Claude Code skill that walks you through the seven phases interactively, with safety gates at each step. Treat it as sharpening the pencil: invoke it whenever your CLAUDE.md feels heavy and let it guide you through the process end to end.
 
 **macOS / Linux:**
 
@@ -55,7 +65,7 @@ curl -fsSL https://raw.githubusercontent.com/royber34/life_os/main/playbooks/cla
 irm https://raw.githubusercontent.com/royber34/life_os/main/playbooks/claude-md-restructure/install.ps1 | iex
 ```
 
-Then, in any Claude Code session, ask: *"restructure my CLAUDE.md"* or *"my CLAUDE.md is bloated"*. The skill kicks in, walks the seven phases, and waits for your confirmation at every gate. You make the judgment calls; the skill executes the mechanical work (audit discovery, hash-verified backup, atomic swap, fresh-session verification).
+Then, in any Claude Code session, ask: *"sharpen my CLAUDE.md"*, *"my CLAUDE.md is bloated"*, or *"restructure my CLAUDE.md"*. The skill kicks in, walks the seven phases, and waits for your confirmation at every gate. You make the judgment calls; the skill executes the mechanical work (audit discovery, hash-verified backup, atomic swap, fresh-session verification).
 
 If you'd rather follow the methodology by hand, the templates and docs below are designed for that path too.
 
