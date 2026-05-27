@@ -11,8 +11,8 @@ If you've been using Claude Code for a few months, your global `~/.claude/CLAUDE
 Three things are happening simultaneously:
 
 1. **Context rot is real and measured.** [Chroma Research (2025)](https://www.trychroma.com/research/context-rot) tested 18 frontier models. Claude Sonnet 4 and Opus 4 exhibit the *largest* gap between focused and full-prompt performance — they're more sensitive to irrelevant context than competitors, not less.
-2. **Anthropic's own engineering team has named this anti-pattern.** The official best-practices guide warns: *"Bloated CLAUDE.md files cause Claude to ignore your actual instructions"* and calls out "the over-specified CLAUDE.md" as a common failure mode. Their documented target: **under 200 lines per CLAUDE.md file**.
-3. **Boris Cherny's own published CLAUDE.md** (he created Claude Code) is ~100 lines / ~2,500 tokens. If yours is 5–10× larger, you're outside the documented best practice from the person who built the system.
+2. **Anthropic's own engineering team has named this anti-pattern.** The official [best-practices guide](https://code.claude.com/docs/en/best-practices) warns: *"Bloated CLAUDE.md files cause Claude to ignore your actual instructions"* and calls out "the over-specified CLAUDE.md" as a common failure mode. The [memory documentation](https://code.claude.com/docs/en/memory) adds a concrete number: **target under 200 lines per CLAUDE.md file**.
+3. **Boris Cherny's own published CLAUDE.md** (he created Claude Code) is ~100 lines. If yours is 5–10× larger, you're outside the documented best practice from the person who built the system.
 
 The cost compounds: combined with MCP tool schemas (25–50k tokens for a typical setup), a 10k-token global CLAUDE.md consumes ~30% of a 200k context window before any actual work begins.
 
@@ -112,7 +112,7 @@ For every multi-step procedure currently embedded in any CLAUDE.md, create a ski
 - A "Source: <how I know this works>" line per procedure — distinguishes battle-tested from theoretical
 - An explicit list of what does NOT belong in the skill (prevents scope creep)
 
-See `templates/skill-SKILL.md` for the structure.
+See `templates/skill-example.md` for the structure.
 
 ### Phase 5 — Move project content to project CLAUDE.mds
 
@@ -230,11 +230,11 @@ The slim global, at the high level, contains:
 │   ├── 05-phased-execution.md   ← Phase-by-phase walkthrough
 │   └── 06-anti-patterns.md      ← Failures to expect and avoid
 ├── templates/
-│   ├── global-CLAUDE.md         ← Anonymized template global
-│   ├── project-CLAUDE.md        ← Project-scope pattern
-│   ├── skill-SKILL.md           ← Skill template, description-first
-│   ├── restore.ps1              ← Windows restore script
-│   └── restore.sh               ← Unix restore script
+│   ├── global-claude-example.md     ← Anonymized example global
+│   ├── project-claude-example.md    ← Project-scope pattern
+│   ├── skill-example.md             ← Skill template, description-first
+│   ├── restore.ps1                  ← Windows restore script
+│   └── restore.sh                   ← Unix restore script
 └── examples/
     └── before-after.md          ← Anonymized before/after with numbers
 ```
