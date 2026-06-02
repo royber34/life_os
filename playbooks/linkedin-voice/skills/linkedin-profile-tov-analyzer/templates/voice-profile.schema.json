@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "voice-profile",
+  "description": "Machine-readable voice profile emitted by linkedin-profile-tov-analyzer and consumed by linkedin-postwriter-guideline-writer. Every interpretive trait should carry evidence (a verbatim quote) and a frequency.",
+  "type": "object",
+  "required": ["name", "corpus", "confidence", "voice_one_liner", "registers", "tone_position", "stylometry", "lexical_signature", "stance_rhetoric", "hooks", "anti_voice"],
+  "properties": {
+    "name": { "type": "string" },
+    "analysis_date": { "type": "string" },
+    "corpus": {
+      "type": "object",
+      "required": ["n_used", "source"],
+      "properties": {
+        "n_attempted": { "type": "integer", "description": "activity entries found/listed" },
+        "n_captured": { "type": "integer", "description": "rendered as usable text and collected" },
+        "n_used": { "type": "integer", "description": "went into the analysis after dropping repost bodies, stubs, duplicates" },
+        "source": { "type": "string", "enum": ["browser", "export", "paste", "mixed"] }
+      }
+    },
+    "confidence": { "type": "string", "enum": ["low", "moderate", "strong"] },
+    "voice_one_liner": { "type": "string" },
+    "registers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "description"],
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "is_primary": { "type": "boolean" }
+        }
+      }
+    },
+    "tone_position": {
+      "type": "object",
+      "description": "1-5 on each NN/G spectrum, with an evidence quote.",
+      "properties": {
+        "formal_casual": { "$ref": "#/$defs/scored" },
+        "serious_funny": { "$ref": "#/$defs/scored" },
+        "respectful_irreverent": { "$ref": "#/$defs/scored" },
+        "matteroffact_enthusiastic": { "$ref": "#/$defs/scored" },
+        "shifts_by_context": { "type": "string" }
+      }
+    },
+    "stylometry": {
+      "type": "object",
+      "description": "Carried over from stylometry.py output (the objective layer).",
+      "properties": {
+        "words_per_sentence_mean": { "type": "number" },
+        "burstiness_stdev": { "type": "number" },
+        "pov": { "type": "object" },
+        "punctuation_per_1000_words": { "type": "object" },
+        "emoji_per_post": { "type": "number" },
+        "hashtags_avg_per_post": { "type": "number" },
+        "type_token_ratio": { "type": "number" }
+      }
+    },
+    "lexical_signature": {
+      "type": "object",
+      "properties": {
+        "signature_phrases": { "type": "array", "items": { "$ref": "#/$defs/evidenced" } },
+        "preferred_words": { "type": "array", "items": { "type": "string" } },
+        "avoided_words": { "type": "array", "items": { "type": "string" } },
+        "hedging_vs_assertion": { "$ref": "#/$defs/evidenced" },
+        "number_habits": { "$ref": "#/$defs/evidenced" }
+      }
+    },
+    "stance_rhetoric": {
+      "type": "object",
+      "properties": {
+        "humour": { "$ref": "#/$defs/evidenced" },
+        "warmth_vs_authority": { "$ref": "#/$defs/evidenced" },
+        "storyteller_vs_explainer": { "$ref": "#/$defs/evidenced" },
+        "signature_moves": { "type": "array", "items": { "$ref": "#/$defs/evidenced" } }
+      }
+    },
+    "hooks": {
+      "type": "array",
+      "description": "Hook patterns the writer actually uses, each with a real example.",
+      "items": {
+        "type": "object",
+        "required": ["pattern", "example"],
+        "properties": {
+          "pattern": { "type": "string" },
+          "example": { "type": "string" },
+          "frequency": { "type": "string" }
+        }
+      }
+    },
+    "anti_voice": {
+      "type": "array",
+      "description": "Constructions, tones, or words that would read as an impostor.",
+      "items": { "type": "string" }
+    }
+  },
+  "$defs": {
+    "evidenced": {
+      "type": "object",
+      "required": ["claim", "quote"],
+      "properties": {
+        "claim": { "type": "string" },
+        "quote": { "type": "string" },
+        "frequency": { "type": "string" }
+      }
+    },
+    "scored": {
+      "type": "object",
+      "required": ["score", "quote"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "quote": { "type": "string" }
+      }
+    }
+  }
+}
