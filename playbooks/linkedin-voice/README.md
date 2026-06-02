@@ -51,6 +51,20 @@ This is **not** for you if:
 
 ---
 
+## Before you start (new to Claude Code?)
+
+These skills run in **Claude Code**, which is part of Claude, not a separate terminal install. If you have only used the Chat side, Claude Code is the same Claude in build mode: open the **Code tab in the Claude desktop app**, or go to **[claude.ai/code](https://claude.ai/code)** in your browser.
+
+Claude Code is included with a paid Claude plan (Pro or Max).
+
+To add these skills, open Claude Code and either paste the one-line installer below, or simply ask it: *"install the linkedin-voice skills from github.com/royber34/life_os."* It is safe: it downloads two skill folders to your computer, does not touch your LinkedIn login, and sends nothing anywhere.
+
+**What you need:** Claude (Pro or Max) with Code, about 12 or more of your own LinkedIn posts, and about 10 minutes.
+
+Not ready? The sections below still work as a read on their own.
+
+---
+
 ## Quick start: install the skills
 
 **macOS / Linux:**
@@ -79,6 +93,8 @@ LinkedIn has no public posts API and blocks third-party scrapers, so the skill u
 1. **Default: Claude collects from your own logged-in browser session.** It opens your activity feed and reads what renders. LinkedIn's feed is virtualized (only a handful of posts render at a time), many entries are non-hydrating "Boost" stubs, and some are deleted, so browser capture often returns fewer posts than you would expect. The skill reports exactly how many it got.
 2. **Optional reliability upgrade: the official data export.** Settings, then Data privacy, then Download my data, then Request new archive, then tick the Posts/Shares file. It returns your full post history as a CSV. LinkedIn rate-limits archive requests to roughly one per 2 hours. Use this when the browser capture is thin or you want the most complete read.
 
+No browser tool connected, or you just want the simplest path? You can also paste your posts into a plain text file (one post per block) and point the skill at that. The export is the most complete route.
+
 Use only your own data, through your own session or export. Third-party scrapers violate LinkedIn's User Agreement and can get your account restricted.
 
 ---
@@ -103,6 +119,11 @@ This is not a formality. In testing, a 5-post sample read a voice as "we"-domina
 ---
 
 ## What's in this repo
+
+For the curious. You do not need to understand any of this to use the skills.
+
+<details>
+<summary>Full repo layout</summary>
 
 ```
 .
@@ -131,6 +152,8 @@ This is not a formality. In testing, a 5-post sample read a voice as "we"-domina
         └── templates/
             └── guideline-template.md          ← The output guideline shape
 ```
+
+</details>
 
 ---
 
