@@ -20,9 +20,9 @@ If you've been using Claude Code for a few months, your global `~/.claude/CLAUDE
 
 Three things are happening simultaneously:
 
-1. **Context rot is real and measured.** [Chroma Research (2025)](https://www.trychroma.com/research/context-rot) tested 18 frontier models. Claude Sonnet 4 and Opus 4 exhibit the *largest* gap between focused and full-prompt performance: they're more sensitive to irrelevant context than competitors, not less.
-2. **Anthropic's own engineering team has named this anti-pattern.** The official [best-practices guide](https://code.claude.com/docs/en/best-practices) warns: *"Bloated CLAUDE.md files cause Claude to ignore your actual instructions"* and calls out "the over-specified CLAUDE.md" as a common failure mode. The [memory documentation](https://code.claude.com/docs/en/memory) adds a concrete number: **target under 200 lines per CLAUDE.md file**.
-3. **Boris Cherny's own published CLAUDE.md** (he created Claude Code) is ~100 lines. If yours is 5–10× larger, you're outside the documented best practice from the person who built the system.
+1. **Context rot is real and measured.** [Chroma Research (2025)](https://www.trychroma.com/research/context-rot) tested 18 frontier models for context rot. The finding: model performance degrades as input length grows, often well before any stated context limit and in non-uniform ways. More context is not free.
+2. **Anthropic's own engineering team has named this anti-pattern.** The official [best-practices guide](https://code.claude.com/docs/en/best-practices) warns: *"Bloated CLAUDE.md files cause Claude to ignore your actual instructions!"* and calls out "the over-specified CLAUDE.md" as a common failure mode. The [memory documentation](https://code.claude.com/docs/en/memory) adds a concrete number: **target under 200 lines per CLAUDE.md file**.
+3. **Boris Cherny, creator of Claude Code, keeps his own minimal.** His personal CLAUDE.md is about two lines, pointing to a small shared team file of a few hundred tokens ([Boris on Hacker News](https://news.ycombinator.com/item?id=46256606)). If yours is many times larger than what the person who built the tool runs, you're outside the design intent.
 
 The cost compounds: combined with MCP tool schemas (25–50k tokens for a typical setup), a 10k-token global CLAUDE.md consumes ~30% of a 200k context window before any actual work begins.
 
@@ -75,7 +75,7 @@ If you'd rather follow the methodology by hand, the templates and docs below are
 
 Every decision in the restructure traces back to one of these. They generalize across any CLAUDE.md setup:
 
-1. **The "would removing this cause Claude to make mistakes?" test.** Apply it to every line. If no, cut it. (Boris Cherny's own articulated test.)
+1. **The "would removing this cause Claude to make mistakes?" test.** Apply it to every line. If no, cut it. (From Anthropic's best-practices guide.)
 2. **State doesn't belong in CLAUDE.md.** Status trackers, task lists, changelogs, last-modified dates: out. They go in dedicated files or git history.
 3. **Procedures don't belong in CLAUDE.md.** Multi-step recipes (five-plus steps, decision branches, verification points) become skills, which load on demand. CLAUDE.md keeps a one-line trigger.
 4. **Reference content doesn't belong in CLAUDE.md.** Architecture documentation, API references, command cheatsheets: separate `.md` files or your project README. CLAUDE.md points at them.
@@ -95,7 +95,7 @@ Don't skip the early ones. They're the reason the rest is safe.
 Spend an hour reading what authoritative sources actually say. Spawn parallel research agents or read manually:
 
 - **Anthropic's official docs**: [best practices](https://code.claude.com/docs/en/best-practices), [memory](https://code.claude.com/docs/en/memory)
-- **Boris Cherny's own CLAUDE.md** (via Charlie Hills' anatomy diagram on Substack): what the creator of Claude Code actually uses
+- **Boris Cherny's documented approach** (via his own posts on X and Hacker News, and howborisusesclaudecode.com): how the creator of Claude Code keeps his setup minimal
 - **Context rot research**: [Chroma Research](https://www.trychroma.com/research/context-rot), [Liu et al. "Lost in the Middle"](https://aclanthology.org/2024.tacl-1.9/), [Anthropic engineering blog on context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - **Real-world CLAUDE.md exemplars**: Trail of Bits, Ory dockertest, Serial-Studio, PyTorch tutorials, Sourcegraph CodeScaleBench, the [josix/awesome-claude-md](https://github.com/josix/awesome-claude-md) curation
 
@@ -195,7 +195,7 @@ Less standard but proved high-leverage during the restructure:
 
 ### The AI-roleplay pressure test
 
-After you have a draft, spawn a separate Claude agent and have it roleplay your inspiration (Boris Cherny, with his documented public positions as constraints: his published CLAUDE.md, his Latent Space podcast statements, the Anthropic best-practices guide he co-authored). Have it review your draft.
+After you have a draft, spawn a separate Claude agent and have it roleplay your inspiration (Boris Cherny, with his documented public positions as constraints: his stated preference for a minimal, vanilla setup per his posts on X and Hacker News, and the Anthropic best-practices guide). Have it review your draft.
 
 In practice this surfaced:
 
@@ -294,7 +294,8 @@ All sources cited throughout are public.
 - [Anthropic: How Claude remembers your project (memory docs)](https://code.claude.com/docs/en/memory)
 - [Anthropic engineering blog: Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
 - [Boris Cherny on the Latent Space podcast](https://www.latent.space/p/claude-code)
-- [Charlie Hills: Anatomy of Boris Cherny's CLAUDE.md](https://charliehills.substack.com/) (anatomy diagram)
+- [Boris Cherny on Hacker News (on keeping CLAUDE.md small)](https://news.ycombinator.com/item?id=46256606)
+- [Boris Cherny on X: his "surprisingly vanilla" setup](https://x.com/bcherny/status/2007179832300581177)
 - [Chroma Research: Context Rot (2025)](https://www.trychroma.com/research/context-rot)
 - [Liu et al.: Lost in the Middle (TACL 2024)](https://aclanthology.org/2024.tacl-1.9/)
 - [HumanLayer: Writing a good CLAUDE.md](https://www.humanlayer.dev/blog/writing-a-good-claude-md)

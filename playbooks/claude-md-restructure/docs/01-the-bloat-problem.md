@@ -22,7 +22,7 @@ None of these are evil in isolation. The problem is that Claude Code concatenate
 
 The intuition that "more context = better answers" is wrong, and there's a growing body of empirical evidence for why.
 
-Chroma Research's [Context Rot](https://www.trychroma.com/research/context-rot) study (2025) tested 18 LLMs (including the frontier Claude, GPT, and Gemini families) on tasks where they varied input length while holding task complexity constant. Their finding, in their own words: "model performance degrades as input length increases, often in surprising and non-uniform ways." Translation: the failure isn't at 200k tokens, where you'd expect it. It starts much earlier, and it's not predictable from length alone.
+Chroma Research's [Context Rot](https://www.trychroma.com/research/context-rot) study (2025) tested 18 LLMs (including the frontier Claude, GPT, and Gemini families) on tasks where they varied input length while holding task complexity constant. Their finding: model performance degrades as input length increases, often in surprising and non-uniform ways. Translation: the failure isn't at 200k tokens, where you'd expect it. It starts much earlier, and it's not predictable from length alone.
 
 This builds on Liu et al.'s ["Lost in the Middle"](https://arxiv.org/abs/2307.03172) paper (TACL 2024), which documented a U-shaped attention pattern across long-context models: information at the beginning and end of the context gets attended to, while information in the middle gets neglected. A 1,500-line CLAUDE.md doesn't just cost tokens; it pushes some of your most important rules into a low-attention zone.
 
@@ -38,9 +38,9 @@ Anthropic's [Claude Code best practices](https://code.claude.com/docs/en/best-pr
 
 The Claude Code [memory documentation](https://code.claude.com/docs/en/memory) is even more specific about size: target under 200 lines per CLAUDE.md file. That's not 200 lines per *workspace*. It's 200 lines per *file*, and since Claude Code loads multiple CLAUDE.md files concurrently (global plus every level of the project tree it walks through), the aggregate matters too.
 
-For a real-world anchor, Boris Cherny (the engineer behind Claude Code) has shared his own personal global CLAUDE.md. The community-maintained [howborisusesclaudecode.com](https://howborisusesclaudecode.com) aggregates the patterns from it. It clocks in at roughly 100 lines. The contents are mostly meta-rules about how Boris wants Claude to *behave*, not encyclopedic context about his work. The signal is dense.
+For a real-world anchor, Boris Cherny (creator of Claude Code) keeps his own setup deliberately minimal: a near-empty personal CLAUDE.md pointing to a small shared team file of a few hundred tokens ([Boris on Hacker News](https://news.ycombinator.com/item?id=46256606)). The contents are mostly meta-rules about how Boris wants Claude to *behave*, not encyclopedic context about his work. The signal is dense.
 
-The implication: if your global CLAUDE.md is 5x or 10x the size of the file written by the person who designed the tool, you're operating outside the design intent.
+The implication: if your global CLAUDE.md is many times the size of what the person who designed the tool runs, you're operating outside the design intent.
 
 ## Token math: what a bloated setup actually costs
 

@@ -11,7 +11,7 @@ Two failure modes if you skip this step:
 1. **Cuts that don't stick.** You delete a section, then in two weeks you re-add it because you can't remember why you cut it. With citations, the rationale lives in your reference file and survives the gap.
 2. **Cuts in the wrong places.** It's easy to cut what feels long and keep what feels comfortable. The research pass gives you principles ("state doesn't belong here," "procedures belong in skills") that let you cut the right things rather than just the obvious ones.
 
-Researched cuts also make this defensible if you're sharing your setup with teammates or writing about it publicly. "I removed this because Anthropic's best-practices guide says CLAUDE.md files over 200 lines start to dilute" is a stronger justification than "I felt like it."
+Researched cuts also make this defensible if you're sharing your setup with teammates or writing about it publicly. "I removed this because Anthropic's memory docs target under 200 lines per CLAUDE.md file" is a stronger justification than "I felt like it."
 
 ## The four source categories
 
@@ -28,9 +28,9 @@ Start here because Anthropic is the source of truth for how Claude Code actually
 
 ### 2. Boris Cherny's CLAUDE.md and adjacent commentary
 
-Boris is the engineer behind Claude Code, and his personal CLAUDE.md is the closest thing we have to a reference implementation.
+Boris is the creator of Claude Code, and his deliberately minimal setup is the closest thing we have to a reference point.
 
-- [howborisusesclaudecode.com](https://howborisusesclaudecode.com): fan site aggregating tips and patterns sourced from Boris's public posts since early 2026. The most accessible reference for the structure and scale of his CLAUDE.md.
+- [howborisusesclaudecode.com](https://howborisusesclaudecode.com): community site aggregating patterns from Boris's public posts. A useful reference for the scale of his setup.
 - HumanLayer's [Writing a good CLAUDE.md](https://www.humanlayer.dev/blog/writing-a-good-claude-md) and adjacent posts have field-tested examples of compact CLAUDE.mds in real codebases.
 
 What to take away: scale, density, and what kinds of content earn a spot.
@@ -106,10 +106,9 @@ The structure that works:
 
 ## Size targets
 - Global CLAUDE.md: under 200 lines per file ([Anthropic memory docs](URL))
-- Boris's reference point: ~100 lines ([howborisusesclaudecode.com](URL))
 
 ## Anchor quotes
-- "A bloated file can dilute its influence and cause Claude to ignore your actual instructions" ([best-practices guide](URL))
+- "Bloated CLAUDE.md files cause Claude to ignore your actual instructions!" ([best-practices guide](URL))
 - "Context as a finite resource with diminishing marginal returns" ([context engineering blog](URL))
 
 ## Patterns to copy
