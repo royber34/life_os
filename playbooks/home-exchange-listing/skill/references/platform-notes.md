@@ -6,16 +6,31 @@ What I learned setting up one listing on each platform in October 2026. Platform
 
 From the official help centre (checked 2026-10-20):
 
-- The value per night comes from three things: **the number and size of the beds**, **the location** (distance to tourist sites), and **some amenities** (pool and garden are the named examples). Each criterion is capped. ([How is the GuestPoints value calculated?](https://help.homeexchange.com/hc/en-us/articles/360000631257))
+- The value per night comes from three things: **the number and size of the beds**, **the location**, and **some amenities** (pool and garden are the named examples). Each criterion is capped. ([How is the GuestPoints value calculated?](https://help.homeexchange.com/hc/en-us/articles/360000631257))
 - Since the December 2025 recalculation: location is set automatically from the address (big international cities and downtown flats count more); **the number of beds that counts is limited by the size of the home**; and eco extras (bikes, EV charging), comfort extras (lift, pool) and accepting pets or children count more. **The new recommendation was not applied automatically**: the owner has to update it from the listing. ([Why have we made changes?](https://help.homeexchange.com/hc/en-us/articles/31858066974237))
-- You can set the value **up to 30 GP per night above the recommendation**. Going higher is forbidden by the terms. ([Can I change the GuestPoint value?](https://help.homeexchange.com/hc/en-us/articles/360000631277))
+- You can set the value **up to 30 GP per night above the recommendation**. Going higher is forbidden by the terms. **Editing the listing can undo the +30**, so set it last and re-check it. ([Can I change the GuestPoint value?](https://help.homeexchange.com/hc/en-us/articles/360000631277))
 
-What one test showed (one listing, so a hint rather than a rule): A/C added 25 GP; ticking "High-speed connection" added nothing; an extra room without a bed added nothing, and floor area and view didn't change the number directly. Beds and the paid-for extras are where the points are.
+What controlled tests showed (one account, unpublished drafts, October 2026; HomeExchange can change this any time). Roughly: **value = location factor x (beds + about 25 per amenity step)**, then up to +30.
+
+- **Beds:** about +11 per extra double (size beyond double doesn't matter) and +6 per single or sofa bed. Bedrooms, bathrooms, floor area, house vs flat and main vs second home added nothing.
+- **Amenities count in steps, 0 to 4, each worth about 25 GP/night** (more in pricier locations). A/C, a pool or a garden alone reach the first step; several together still make one step. A broad "fully equipped" set reaches the second. A few small items on top (energy-efficient appliances, public transport, waste sorting) reached the third. Many single items add nothing alone (wifi, high-speed connection, lift, balcony, parking, kids' items).
+- **Location** comes from the postcode and is coarse: a city centre and a suburb nearby scored the same; big international cities score higher. "Coastal" or "countryside" surroundings and a view added nothing.
 
 Other HomeExchange facts:
 
-- Exchanging needs a paid membership. New listings get welcome GuestPoints, and part of them lapses if the membership isn't paid within the deadline shown in the account.
-- Below 80% profile completion the listing goes offline. A profile photo, languages and a bio move the meter a lot.
+- Exchanging needs a paid membership. Welcome GuestPoints: 50 for the account, 750 for the first completed listing (they lapse unless you subscribe within 3 months), 500 on first subscribing. ([How can I obtain GuestPoints?](https://help.homeexchange.com/hc/en-us/articles/360000631317))
+- 80% completion is needed to see full listings, contact members and verify; aim for 100%. A profile photo, languages and a bio move the meter a lot.
+- Search ranking favours hosts who are active, reply fast, update the calendar and complete exchanges. Reply to every request, even with a no. ([How are search results ordered?](https://help.homeexchange.com/hc/en-us/articles/360000730577))
+- Minimum stay is a preference: guests can still ask for shorter stays.
+
+## HomeExchange: rules that get accounts closed
+
+- **Renting:** a tenant must have the owner's authorization to list (Terms, listings warranty). Without it the account and all its GuestPoints are at risk.
+- **Fees:** the only fee allowed is a checkout cleaning fee (or a required tourist tax), reasonable and agreed in advance. ([Can hosts ask for extra fees?](https://help.homeexchange.com/hc/en-us/articles/360009466098))
+- **Insurance:** every member must carry home or renter's insurance. HomeExchange's guarantees cover guest damage to contents; your own insurer comes first for structural damage. ([Guarantees vs home insurance](https://help.homeexchange.com/hc/en-us/articles/360000619417))
+- **Host present:** a whole-home listing means the guest has the home. If the user stays home, they need a separate private-room listing with the room's own size and only the amenities the guest can use. ([Can I host guests while I'm staying at home?](https://help.homeexchange.com/hc/en-us/articles/360019707377))
+- **Verification:** email and phone, then ID plus proof of address within 6 months (phone or electricity bill for the listed home, in the account holder's name). ([What is the verification process?](https://help.homeexchange.com/hc/en-us/articles/360000611557))
+- **One account per household**, with all its homes on it. Check that a partner doesn't already have one.
 
 ## HomeExchange: browser quirks
 

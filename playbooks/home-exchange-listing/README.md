@@ -58,17 +58,17 @@ Claude never types passwords, ID numbers or card details, and it asks before any
 
 - logging in;
 - typing the Wi-Fi password;
-- ID or phone verification;
-- paying a membership (HomeExchange needs one to exchange);
+- verification (ID plus a phone or electricity bill for the address, under 6 months old) and paying a membership (HomeExchange needs one to exchange);
 - approving the listing going live and any message to support.
 
 ---
 
 ## Good to know
 
-- **HomeExchange values your home by beds, location and amenities**, with each capped. Exact beds (including sofa beds) and every real extra (A/C, lift, pool, bikes) count most; floor area mainly sets how many beds can count, and a view adds nothing on its own. Details and sources are in [`platform-notes.md`](skill/references/platform-notes.md).
+- **HomeExchange values your home by beds, location and amenities**, with each capped. Exact beds (including sofa beds) and every true amenity count most: amenities add value in steps of about 25 GP/night, so a few small true ticks can matter. Bedrooms, floor area and a view add nothing directly. Details and sources are in [`platform-notes.md`](skill/references/platform-notes.md).
 - **Kindred pays one credit per night for every home**, so there the work goes into photos, copy and your profile.
-- **Renting?** Check whether your lease allows home exchanges. The skill mentions it once and leaves the call to you.
+- **Renting?** HomeExchange's terms require the owner's authorization, and your lease may forbid it. Without it, the account and its GuestPoints are at risk. The skill says this once and leaves the call to you.
+- **Insurance:** HomeExchange requires home or renter's insurance.
 
 <details>
 <summary>What's in this folder</summary>

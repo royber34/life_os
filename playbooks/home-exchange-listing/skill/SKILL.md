@@ -19,7 +19,8 @@ Keep it simple. Don't build anything the user didn't ask for.
 - **Ask before anything that publishes or sends.** That covers publishing the listing, messaging support or concierge, and accepting terms or chat guidelines. HomeExchange can publish a listing as a side effect of saving a setting (see the platform notes), so tell the user before you make the last edits.
 - **Don't infer facts.** "Take the stairs to the 3rd floor" does not mean there is no lift. If the folder doesn't say it, ask.
 - **No overclaiming, but tick everything that's true.** Amenities raise the value, so go through every amenity page. Tick what exists. Leave out what doesn't.
-- **Lease or landlord rules:** if the folder suggests the user rents, mention once that subletting or exchange permission may matter. Then do what the user decides.
+- **Renting:** if the user rents, say once, plainly: HomeExchange's terms require the owner's authorization to list a rented home, and without it the account (and every GuestPoint in it) can be closed. The lease may forbid it too. Then do what the user decides.
+- **HomeExchange is hosting between members:** the only fee allowed is an optional checkout cleaning fee, and the copy avoids rental wording. The platform notes list the rules that get accounts closed.
 
 Read `references/platform-notes.md` before you start. It holds the points rules and the browser quirks that cost the most time last time.
 
@@ -36,7 +37,7 @@ Read `references/platform-notes.md` before you start. It holds the points rules 
 Write these into `home-facts.md` under "Listing copy" so the user can reuse them on other platforms:
 
 - **Title.** Lead with the strongest true selling point plus the area, for example "Sea-view flat in [neighbourhood], near [city]". Keep it short; Kindred caps titles at 50 characters.
-- **Description.** First open the platform's own examples or tips ("See examples" on Kindred) and match their tone. A shape that works: what you love about the home, then the neighbourhood and what's walkable, then who it suits (families, remote work, couples), then "Good to know" with the honest caveats (stairs, a mattress on the floor, no parties). Write in first person, warm and practical, with no superlatives you can't back up.
+- **Description.** First open the platform's own examples or tips ("See examples" on Kindred) and match their tone. A shape that works: what you love about the home, then the neighbourhood and what's walkable, then who it suits (families, remote work, couples), then "Good to know" with the honest caveats (stairs, a mattress on the floor, no parties). Write in first person, warm and practical, with no superlatives you can't back up. Write it like hosting a friend: no "price", "rent" or "booking".
 - **Neighbourhood text** (HomeExchange asks for it separately): transport, shops, beach or parks, with walking times.
 - **Photo order.** The cover is the single best room shot, usually a bright living room or the view. Then the bedrooms, bathrooms, kitchen, workspace and outdoor areas or the area. Leave out blurry or dark shots, people, and anything that shows the exact address or the building entrance. Tag each photo with its real room, and don't tag a public beach as a private garden or yard.
 - **Profile.** Members choose the host as much as the home. Prepare a short, friendly bio plus the languages the user speaks. Ask how much personal detail they want shown; job details and full-name social links are optional. For Kindred, also prepare two adjectives for the home, at least three interest tags, and ask the user for a profile picture plus at least three personal photos.
@@ -47,22 +48,24 @@ Show the title, description and photo order to the user and get a yes.
 
 Load the Claude in Chrome tools (`mcp__claude-in-chrome__*`) in one ToolSearch call, including `file_upload`, `find`, `read_page`, `computer`, `navigate` and `javascript_tool`, and open a new tab. If they aren't available, tell the user to install and connect the Claude in Chrome extension (in a terminal session, `/chrome`) and stop. Confirm the user is logged in to the right account. Then work through the platform's setup wizard step by step:
 
-- **Rooms and beds:** exact bed sizes, plus sofa beds and extra beds. On HomeExchange, beds are a main driver of the GuestPoints value.
-- **Amenities:** every page and sub-page. On HomeExchange, the comfort and eco extras count (lift, A/C, pool, garden, bikes, EV charging), and so does accepting children or pets if the user is willing.
+- **Rooms and beds:** exact bed sizes, plus every sofa bed and extra bed. On HomeExchange, beds are the main driver of the value; bedrooms, bathrooms and floor area are not counted directly.
+- **Amenities:** every page and sub-page, including the eco page (energy-efficient appliances, public transport, waste sorting). On HomeExchange the value jumps in steps of about 25 GP/night, so a few small true items can tip it into the next step. Accepting children or pets counts too, if the user is willing.
 - **Photos:** upload in the planned order with `file_upload` (absolute paths). The first photo becomes the cover. Then tag the rooms.
 - **Availability:** ask for the dates and a minimum stay. A minimum of 7 nights is a sensible default for a full-time home; shorter is fine for a second home. One long window is simpler than many short ones, since the user can decline requests.
 - **First guests:** if the platform offers "experienced members only", ask the user whether they want it.
+- **Exchange types** (HomeExchange): ask which the user is open to (reciprocal at the same time, reciprocal at different times, GuestPoints). Open to all gets the most requests. A listing setting can make reciprocal exchanges 0 GP automatically.
+- **Cleaning fee** (HomeExchange): only if the user wants one. The only fee HomeExchange allows is a reasonable checkout cleaning fee, written in the listing.
 - **Privacy:** on Kindred, set "Home preview settings" to "No preview" unless the user wants a public teaser.
-- **Profile:** fill it in until the completion meter is high. HomeExchange takes a listing offline below 80% complete.
+- **Profile:** fill it in to 100%. On HomeExchange, 80% is needed to contact members and to verify, and a completed listing unlocks the welcome GuestPoints.
 
 After each wizard part, check what saved. Re-read the page (screenshot, `read_page`, or JavaScript `innerText`) rather than trusting your clicks.
 
 ## Step 4: Maximise the value (HomeExchange)
 
-1. Once the listing is complete, open **My home** and look at the recommended GuestPoints per night.
+1. Do this last, after all other edits: editing the listing can undo the +30 below. Open **My home** and look at the recommended GuestPoints per night.
 2. If the listing existed before December 2025, the new recommendation does not apply itself. Update it from the listing.
-3. Offer the user the adjustment of up to **+30 GP per night** above the recommendation, which the platform allows. Never go above +30: HomeExchange's terms forbid it.
-4. If the value looks low next to similar homes nearby, the user can ask support for a review. Offer to draft it; send only with their approval.
+3. Offer the user the adjustment of up to **+30 GP per night** above the recommendation, which the platform allows. Never go above +30: HomeExchange's terms forbid it. Mention the tradeoff: a higher value earns more per night, a lower one can win more requests in busy cities. The user picks.
+4. If the value looks low next to similar homes nearby, remember those may include their own +30, an old pre-December-2025 value or the Collection bonus. If it's still low, the user can ask support for a review; offer to draft it and send only with their approval.
 
 On Kindred, skip this step: credits are one per night for every home. Put the effort into photos, copy and the profile instead.
 
@@ -71,7 +74,11 @@ On Kindred, skip this step: credits are one per night for every home. Put the ef
 Show the user:
 
 - the listing URL, and whether it is published or offline (on HomeExchange, the "Home published" toggle in the editor is the one to trust);
-- the GuestPoints value and what drove it (HomeExchange);
-- what's left for them: ID or phone verification, the membership payment if they want to exchange (HomeExchange's welcome GuestPoints can lapse if they don't pay within the deadline shown), the Wi-Fi password, and anything you couldn't confirm.
+- the GuestPoints value and what drove it (HomeExchange), re-checked after the last edit;
+- what's left for them:
+  - **Verification** (HomeExchange): ID plus a recent phone or electricity bill for the listed home (details in the platform notes). Make sure the listed address matches that bill exactly.
+  - **Membership**, if they want to exchange. The 750 welcome GuestPoints for a completed listing lapse unless they subscribe within 3 months.
+  - The Wi-Fi password, and anything you couldn't confirm.
+- how to get the first exchange: reply to every request quickly, even with a no (unanswered requests count against you), and update the calendar regularly. Activity and responsiveness rank the listing in search, and a first hosted stay brings the first review.
 
 Update `home-facts.md` with the final copy and the listing URL, so a second platform takes minutes.

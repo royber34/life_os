@@ -7,7 +7,8 @@ Last updated: YYYY-MM-DD
 ## Must-have (the listing can't be built without these)
 
 - Address (street, number, unit, postcode, city):
-- Type (apartment / house / other) and whether guests get the entire home:
+- Type (apartment / house / other):
+- Will you be away during stays (entire home), or staying home (private room)?
 - Size in m² (or sq ft):
 - Bedrooms (rooms with a bed, not storage rooms):
 - Beds per room, with exact sizes (e.g. "Bedroom 1: double 180x200"), plus sofa beds and extra beds:
@@ -16,6 +17,7 @@ Last updated: YYYY-MM-DD
 - Floor and access (lift? stairs? step-free?):
 - Wi-Fi (yes/no, download/upload speed in Mbps: run a test at fast.com or speedtest.net at home):
 - Pets allowed as guests? Children welcome?
+- Home or renter's insurance (HomeExchange requires it):
 - Smoking / parties rules:
 - Availability (dates) and minimum stay in nights:
 - Photos folder (or "photos are in this folder"):
@@ -34,7 +36,9 @@ Last updated: YYYY-MM-DD
 - Languages you speak:
 - Household (who lives there; for the profile):
 - Your own pets (and who looks after them during an exchange):
-- Rent or own (if renting, does the lease allow exchanges?):
+- Rent or own (if renting, do you have the owner's OK? HomeExchange requires it):
+- Open to: reciprocal at the same time / at different times / GuestPoints:
+- Checkout cleaning fee (optional; the only fee allowed):
 
 ## Listing copy
 
