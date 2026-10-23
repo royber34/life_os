@@ -10,6 +10,8 @@
 #   2. Creates ~/.claude/skills/<skill>/ for both skills.
 #   3. Downloads each skill's files (SKILL.md, references, scripts) from the repo.
 #   4. Prompts before overwriting if a skill is already installed.
+#      To update without a prompt (for example when Claude Code runs it), set LP_B2B_OVERWRITE=1:
+#        curl -fsSL https://raw.githubusercontent.com/royber34/life_os/main/playbooks/lp-b2b/install.sh | LP_B2B_OVERWRITE=1 bash
 #
 # After install, in a Claude Code session started in your page's folder, ask:
 #   "build me a landing page for my offer"    (the builder)
@@ -52,17 +54,21 @@ install_skill() {
 
   if [ -d "$DEST/$skill" ]; then
     echo "Note: $DEST/$skill already exists."
-    if [ -e /dev/tty ]; then
-      read -p "Overwrite $skill? [y/N] " -n 1 -r REPLY < /dev/tty || REPLY=""
-      echo
+    if [ "${LP_B2B_OVERWRITE:-}" != "1" ]; then
+      REPLY=""
+      if [ -e /dev/tty ]; then
+        read -p "Overwrite $skill? [y/N] " -n 1 -r REPLY < /dev/tty 2>/dev/null || REPLY=""
+        echo
+      else
+        echo "No terminal for confirmation. To update, run again with LP_B2B_OVERWRITE=1."
+      fi
       if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
         echo "Skipping $skill (existing install left unchanged)."
         return 0
       fi
-    else
-      echo "No terminal for confirmation; skipping $skill. Remove it first to reinstall."
-      return 0
     fi
+    # Remove the old copy so files dropped in a newer version don't linger.
+    rm -rf "${DEST:?}/$skill"
   fi
 
   echo "Installing $skill ..."
@@ -82,7 +88,7 @@ install_skill "$REVIEW" "$REVIEW_FILES"
 echo ""
 echo "Installed into $DEST/"
 echo ""
-echo "Next: start a Claude Code session in your page's folder and ask:"
+echo "Next: start a NEW Claude Code session in your page's folder (a session that was already open won't see the new skills) and ask:"
 echo "  'build me a landing page for my offer'    (starts with the key questions)"
 echo "  'review my landing page as a cold buyer'  (the review on its own)"
 echo ""

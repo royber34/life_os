@@ -8,6 +8,8 @@
 #   2. Creates ~/.claude/skills/<skill>/ for both skills.
 #   3. Downloads each skill's files (SKILL.md, references, scripts) from the repo.
 #   4. Prompts before overwriting if a skill is already installed.
+#      To update without a prompt (for example when Claude Code runs it), set LP_B2B_OVERWRITE=1:
+#        $env:LP_B2B_OVERWRITE = "1"; irm https://raw.githubusercontent.com/royber34/life_os/main/playbooks/lp-b2b/install.ps1 | iex
 #
 # After install, in a Claude Code session started in your page's folder, ask:
 #   "build me a landing page for my offer"    (the builder)
@@ -64,11 +66,22 @@
     $skillDir = Join-Path $Dest $skill
 
     if (Test-Path $skillDir) {
-      $resp = Read-Host "Note: $skill already exists. Overwrite? [y/N]"
-      if ($resp -notmatch "^[Yy]$") {
+      $overwrite = ($env:LP_B2B_OVERWRITE -eq "1")
+      if (-not $overwrite) {
+        # Read-Host throws when there is no console to ask (for example when Claude Code runs this).
+        try {
+          $resp = Read-Host "Note: $skill already exists. Overwrite? [y/N]"
+          $overwrite = ($resp -match "^[Yy]$")
+        } catch {
+          Write-Host "No terminal for confirmation. To update, run again with `$env:LP_B2B_OVERWRITE = `"1`"."
+        }
+      }
+      if (-not $overwrite) {
         Write-Host "Skipping $skill (existing install left unchanged)."
         continue
       }
+      # Remove the old copy so files dropped in a newer version don't linger.
+      Remove-Item -Recurse -Force $skillDir
     }
 
     Write-Host "Installing $skill ..."
@@ -92,7 +105,7 @@
   Write-Host ""
   Write-Host "Installed into $Dest" -ForegroundColor Green
   Write-Host ""
-  Write-Host "Next: start a Claude Code session in your page's folder and ask:"
+  Write-Host "Next: start a NEW Claude Code session in your page's folder (a session that was already open won't see the new skills) and ask:"
   Write-Host "  'build me a landing page for my offer'    (starts with the key questions)"
   Write-Host "  'review my landing page as a cold buyer'  (the review on its own)"
   Write-Host ""

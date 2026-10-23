@@ -79,7 +79,7 @@ For screenshots, page checks and the link preview image, the skills use Python w
 
 ## Quick start: install the skills
 
-The simplest way: ask Claude Code *"install the lp-b2b skills from github.com/royber34/life_os."* If you'd rather use a terminal, paste one of these lines. Each script only downloads the two skill folders; you can read it first.
+The simplest way: ask Claude Code *"install the lp-b2b skills from github.com/royber34/life_os."* If you'd rather use a terminal, paste one of these lines. Each script only downloads the two skill folders; you can read [install.sh](install.sh) or [install.ps1](install.ps1) first.
 
 **macOS / Linux:**
 
@@ -93,7 +93,9 @@ curl -fsSL https://raw.githubusercontent.com/royber34/life_os/main/playbooks/lp-
 irm https://raw.githubusercontent.com/royber34/life_os/main/playbooks/lp-b2b/install.ps1 | iex
 ```
 
-Both skills go into `~/.claude/skills/`. Then start a Claude Code session in your page's folder (in the desktop app, choose that folder when you start the session) and ask:
+Both skills go into `~/.claude/skills/`. To update later, ask Claude Code to *"update the lp-b2b skills from github.com/royber34/life_os"*; it runs the same line with `LP_B2B_OVERWRITE=1`, which replaces the old copy without asking.
+
+Then start a **new** Claude Code session in your page's folder (a session that was already open won't see the new skills; in the desktop app, choose that folder when you start the session) and ask:
 
 - *"Build me a landing page for my offer."* starts at the questions.
 - *"Where are we with my landing page?"* picks up where you left off.
