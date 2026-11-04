@@ -12,6 +12,8 @@ Personal and business life-systems repo by [Roy Bernheim](https://github.com/roy
 - **[home-exchange-listing/](playbooks/home-exchange-listing/)**: a skill that builds your HomeExchange or Kindred listing from a folder of home info and photos, in your own logged-in Chrome. Asks only for what's missing, writes honest copy, and gets the GuestPoints value as high as the rules allow.
 - **[lp-b2b/](playbooks/lp-b2b/)**: two skills for B2B sales pages a buyer can act on without a call. One builds the page with you in five approved stages, starting from a handful of questions about your offer; the other reviews any page through the eyes of first-time visitors who have never heard of you, and says when to stop iterating. Built after two real page builds; in one, four rounds of simulated reviewers who had been briefed on the offer missed what I saw in one look as a stranger would.
 
+- **[ai-result-check/](playbooks/ai-result-check/)**: copy-paste prompts for any AI tool, plus a Claude Code skill, for testing an AI result before you rely on it: did it read everything, is it accurate, complete, repeatable, not overstated. Ends with a label saying whether the result is accurate to the raw data or directional only.
+
 More playbooks as they're added.
 
 ## License
