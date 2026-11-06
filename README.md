@@ -14,6 +14,8 @@ Personal and business life-systems repo by [Roy Bernheim](https://github.com/roy
 
 - **[ai-result-check/](playbooks/ai-result-check/)**: copy-paste prompts for any AI tool, plus a Claude Code skill, for testing an AI result before you rely on it: did it read everything, is it accurate, complete, repeatable, not overstated. Ends with a label saying whether the result is accurate to the raw data or directional only.
 
+- **[company-teardown/](playbooks/company-teardown/)**: a skill that reverse-engineers any company into a sourced, independently checked research archive and one interactive page. It opens on what to do, then shows what has worked by channel, angle, offer and format, a dated timeline, what campaigns moved, competition and a deep dive. It measures its own error rate, and it runs a review panel by role before you see the page.
+
 More playbooks as they're added.
 
 ## License

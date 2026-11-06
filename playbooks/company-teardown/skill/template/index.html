@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<title>__TITLE__</title>
+<style>
+/*__CSS__*/
+</style>
+</head>
+<body>
+<div class="tt tt-shell">
+  <header class="tt-head" id="top">
+    <h1 class="tt-title" data-text="name"></h1>
+    <p class="tt-lede" data-text="lede"></p>
+    <nav class="tt-tabs" aria-label="Sections"></nav>
+  </header>
+
+  <!-- OVERVIEW -->
+  <section class="tt-page" data-page="overview" id="overview" hidden>
+    <div data-band="overview" hidden></div>
+    <div class="tt-kpis" data-draw="kpis"></div>
+    <div data-draw="verification"></div>
+    <div data-draw="connections"></div>
+    <div class="tt-grid3" data-draw="summary"></div>
+    <div class="tt-grid3" data-draw="navcards"></div>
+  </section>
+
+  <!-- SO WHAT -->
+  <section class="tt-page" data-page="sowhat" id="sowhat" hidden>
+    <div data-band="sowhat" hidden></div>
+    <div data-has-moves class="tt-page" hidden>
+      <div class="tt-part"><h2>The moves</h2></div>
+      <div data-draw="movesanswer"></div>
+      <section class="tt-card">
+        <div class="tt-card-head">
+          <h2>Identified areas at a glance</h2>
+          <p class="tt-note">Impact and effort are ranks from 1 to 5, comparing these areas with each other.</p>
+        </div>
+        <div class="tt-plan-wrap" data-draw="movesplan"></div>
+      </section>
+      <div class="tt-page" data-draw="moveslist"></div>
+      <section class="tt-card">
+        <div class="tt-card-head">
+          <h2>How internal numbers could change the reading</h2>
+        </div>
+        <div class="tt-plan-wrap" data-draw="movesrules"></div>
+      </section>
+      <section class="tt-card">
+        <div class="tt-card-head">
+          <h2>Impact against effort</h2>
+          <p class="tt-note">Relative judgement, with no dollar figures, since sales and spend are not public.</p>
+        </div>
+        <div data-draw="movesmatrix"></div>
+      </section>
+      <section class="tt-card">
+        <div class="tt-card-head">
+          <h2>Data that would settle these</h2>
+          <p class="tt-note">What only the company holds, and what each item bears on.</p>
+        </div>
+        <div class="tt-plan-wrap" data-draw="movesrequest"></div>
+      </section>
+      <div class="tt-part"><h2>Opportunities</h2></div>
+      <div class="tt-insight-grid" data-draw="sowopps"></div>
+      <div class="tt-part"><h2>What's working and what isn't</h2></div>
+      <div class="tt-lens-grid tt-two" data-draw="sowworking"></div>
+      <div class="tt-part"><h2>The evidence and the fuller reading</h2></div>
+      <div class="tt-facts" data-draw="movesfacts"></div>
+      <section class="tt-card">
+        <div class="tt-card-head">
+          <h2>SWOT</h2>
+          <p class="tt-note">Each point says what follows from it and how the fact was sourced. Evidence is medium unless marked.</p>
+        </div>
+        <div class="tt-swotgrid" data-draw="movesswot"></div>
+      </section>
+      <section class="tt-card">
+        <div class="tt-card-head">
+          <h2>Where the SWOT crosses</h2>
+          <p class="tt-note">Each pairs an inside fact with an outside one, and leads to moves.</p>
+        </div>
+        <div class="tt-crosses" data-draw="movescross"></div>
+      </section>
+    </div>
+    <div class="tt-page" data-draw="sowhat"></div>
+    <section class="tt-card" data-has-moves hidden>
+      <div class="tt-card-head"><h2>What this cannot show</h2></div>
+      <div class="tt-prose" data-draw="moveslimits"></div>
+    </section>
+  </section>
+
+  <!-- TIMELINE -->
+  <section class="tt-page" data-page="timeline" id="timeline" hidden>
+    <div data-band="timeline" hidden></div>
+    <section class="tt-card tt-filters" aria-label="Filters">
+      <div class="tt-row">
+        <span class="tt-flabel">Lanes</span>
+        <div class="tt-chips" role="group" aria-label="Lanes" data-chips="lanes"></div>
+        <button class="tt-btn" data-act="lanes-all">All</button>
+        <button class="tt-btn" data-act="lanes-none">None</button>
+      </div>
+      <div class="tt-row">
+        <span class="tt-flabel">Show</span>
+        <select class="tt-select" data-bind="tperiod" data-opts="periods" aria-label="Time range"></select>
+        <select class="tt-select" data-bind="tbasis" data-opts="basis" aria-label="Facts or inferences"></select>
+        <select class="tt-select" data-bind="tconf" data-opts="conf" aria-label="Confidence"></select>
+        <select class="tt-select" data-draw="person" aria-label="Person"></select>
+        <input class="tt-q" type="search" data-q="tq" placeholder="Search events" aria-label="Search events">
+        <button class="tt-btn" data-act="zoom-reset" data-scope="t" data-zoomed="t" hidden>Reset zoom</button>
+        <button class="tt-btn" data-act="reset">Reset all</button>
+      </div>
+    </section>
+    <section class="tt-card" id="chronology">
+      <div class="tt-card-head">
+        <h2>Chronology by lane</h2>
+        <p class="tt-note">Each row is one angle on the business. Shaded bands are its phases, bars are periods (a price level, a campaign, someone's time in a role), dots are dated events. Drag across the strip under the chart to zoom.</p>
+      </div>
+      <div class="tt-swim" data-draw="swim"></div>
+      <div class="tt-over" data-draw="zoomstrip" data-source="events" data-scope="t"></div>
+      <ul class="tt-legend" data-draw="swimlegend"></ul>
+    </section>
+    <section class="tt-card">
+      <div class="tt-card-head"><h2>Selected event</h2></div>
+      <p class="tt-nosel" data-hide-if="sel">Click a mark on the chronology or a row in the table to read its detail and source.</p>
+      <div class="tt-detail" data-draw="detail"></div>
+    </section>
+    <section class="tt-card" data-needs="metric_cards">
+      <div class="tt-card-head">
+        <h2>Growth and scale over the same period</h2>
+        <p class="tt-note">Pick the measures to compare. Dashed rules mark turning points; a solid rule marks the selected event. Estimates are labelled inferences.</p>
+      </div>
+      <div class="tt-chips" role="group" aria-label="Measures" data-chips="metrics"></div>
+      <div class="tt-metrics" data-mcards></div>
+    </section>
+    <section class="tt-card">
+      <div class="tt-card-head"><h2>Every event</h2><p class="tt-note">Filtered by the controls and the time range above. Click a row to select it. <span class="tt-count" data-draw="count">0</span> events match.</p></div>
+      <div class="tt-tablewrap">
+        <table class="tt-table tt-events">
+          <thead><tr><th data-sortable="t" aria-sort="ascending"><button class="tt-sort" data-act="sort" data-scope="t">Date</button></th><th>Lane</th><th>Event</th><th class="tt-hide-narrow">Person</th><th>Basis</th><th class="tt-hide-narrow">Confidence</th><th class="tt-hide-narrow">Source</th></tr></thead>
+          <tbody data-draw="rows" data-rowkey="sel"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- GTM -->
+  <section class="tt-page" data-page="gtm" id="gtm" hidden>
+    <div data-band="gtm" hidden></div>
+    <div class="tt-page" data-draw="gtminsights"></div>
+    <section class="tt-card" data-needs-impact hidden>
+      <div class="tt-card-head">
+        <h2>What campaigns moved</h2>
+        <div class="tt-note tt-prose" data-draw="impactintro"></div>
+      </div>
+      <div class="tt-chips" role="group" aria-label="Metric" data-draw="impactviews"></div>
+      <div class="tt-impact-chart" data-draw="impactchart"></div>
+      <div class="tt-dpanel" data-draw="impactdetail"></div>
+      <h3>Campaigns on this metric</h3>
+      <div class="tt-plan-wrap tt-scroll" data-draw="impactrows"></div>
+      <h3>By campaign type, across all metrics</h3>
+      <div class="tt-plan-wrap" data-draw="impacttypes"></div>
+    </section>
+    <div class="tt-part"><span class="tt-part-kicker">The record</span><h2>Every action, as tracked</h2></div>
+    <section class="tt-card">
+      <div class="tt-card-head">
+        <h2>The go-to-market engine</h2>
+        <div class="tt-note tt-prose" data-draw="gtmintro"></div>
+      </div>
+    </section>
+    <section class="tt-card tt-filters" aria-label="GTM filters">
+      <div class="tt-row">
+        <span class="tt-flabel">Channels</span>
+        <div class="tt-chips" role="group" aria-label="Channels" data-chips="channels"></div>
+        <button class="tt-btn" data-act="gch-all">All</button>
+        <button class="tt-btn" data-act="gch-none">None</button>
+      </div>
+      <div class="tt-row">
+        <span class="tt-flabel">Show</span>
+        <select class="tt-select" data-bind="gperiod" data-opts="periods" aria-label="Time range"></select>
+        <select class="tt-select" data-bind="gbasis" data-opts="basis" aria-label="Facts or inferences"></select>
+        <select class="tt-select" data-bind="gconf" data-opts="conf" aria-label="Confidence"></select>
+        <input class="tt-q" type="search" data-q="gq" placeholder="Search actions" aria-label="Search actions">
+        <button class="tt-btn" data-act="zoom-reset" data-scope="g" data-zoomed="g" hidden>Reset zoom</button>
+        <button class="tt-btn" data-act="reset">Reset all</button>
+      </div>
+    </section>
+    <section class="tt-card">
+      <div class="tt-card-head">
+        <h2>Every action, in order, by channel</h2>
+        <p class="tt-note">Bubble size is reach (views); small dots have no view count. The shaded band on the right holds actions seen only on the read date, whose real start is unknown. Dashed rules are the turning points from the timeline. Drag across the strip below to zoom.</p>
+      </div>
+      <div class="tt-chart tt-swim" data-draw="gtmchart"></div>
+      <div class="tt-over" data-draw="zoomstrip" data-source="gtm" data-scope="g"></div>
+      <ul class="tt-legend"><li><i class="tt-sw is-big" style="background:var(--cds-chart-1)"></i>Reach, sized by views</li><li><i class="tt-sw is-hollow"></i>Inference</li></ul>
+    </section>
+    <section class="tt-card" data-needs="response_curves">
+      <div class="tt-card-head">
+        <h2>What it moved</h2>
+        <p class="tt-note">Response curves scaled to each one's peak in the range, so their timing lines up. Dashed rules mark the top tenth of actions by views; the solid rule is the selected action. Hover for real values. Lines overlapping an action show timing, and they don't prove it caused anything.</p>
+      </div>
+      <div class="tt-chips" role="group" aria-label="Response curves" data-chips="curves"></div>
+      <div class="tt-metric" data-draw="gtmlift"></div>
+    </section>
+    <section class="tt-card">
+      <div class="tt-card-head"><h2>Selected action</h2></div>
+      <p class="tt-nogsel" data-hide-if="gsel">Click a bubble or a table row to see the hook, call to action, reach and measured response.</p>
+      <div class="tt-detail" data-draw="gtmdetail"></div>
+    </section>
+    <section class="tt-card">
+      <div class="tt-card-head"><h2>Every action</h2><p class="tt-note"><span class="tt-count" data-draw="gtmcount">0</span> actions match the filters and range.</p></div>
+      <div class="tt-tablewrap">
+        <table class="tt-table tt-gtmtable">
+          <thead><tr><th data-sortable="g" aria-sort="ascending"><button class="tt-sort" data-act="sort" data-scope="g">Date</button></th><th>Channel</th><th class="tt-hide-narrow">Actor</th><th>Action</th><th>Views</th><th>Basis</th><th class="tt-hide-narrow">Source</th></tr></thead>
+          <tbody data-draw="gtmrows" data-rowkey="gsel"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="tt-card" data-prose="gtm.playbook">
+      <div class="tt-card-head"><h2>The playbook, reconstructed</h2></div>
+      <div class="tt-prose" data-draw="gtmplaybook"></div>
+    </section>
+  </section>
+
+  <!-- COMPETITION -->
+  <section class="tt-page" data-page="competition" id="competition" hidden>
+    <div data-band="competition" hidden></div>
+    <div class="tt-part">
+      <span class="tt-part-kicker">Competition</span>
+      <h2>The key players</h2>
+      <p class="tt-note"><b data-draw="compcount">0</b> players match. Each is profiled on business model, size, traction, funding, positioning, target users, go to market, moat and weaknesses. Scores and threat ratings are the writer's judgement. Filters here apply to every view in this tab.</p>
+    </div>
+    <div class="tt-empty" data-hide-unless-empty="competitors">No competitors in this bundle.</div>
+    <section class="tt-card tt-filters" aria-label="Competitor filters" data-needs="competitors">
+      <div class="tt-row">
+        <span class="tt-flabel">Filter</span>
+        <select class="tt-select" data-bind="cgrp" data-opts="groups" aria-label="Player group"></select>
+        <select class="tt-select" data-bind="cthreat" data-opts="threat" aria-label="Threat level"></select>
+        <select class="tt-select" data-bind="cconf" data-opts="conf" aria-label="Confidence"></select>
+        <input class="tt-q" type="search" data-q="cq" placeholder="Search players" aria-label="Search players">
+        <button class="tt-btn" data-act="comp-clear">Clear filters</button>
+      </div>
+    </section>
+    <section class="tt-card" data-needs="competitors">
+      <div class="tt-card-head">
+        <h2>Positioning map</h2>
+        <p class="tt-note">Each player scored from zero to five by the writer. Pick any two axes. Larger dots are bigger threats. Click a dot for the full profile.</p>
+      </div>
+      <div class="tt-row">
+        <span class="tt-flabel">Across</span>
+        <select class="tt-select" data-bind="cx" data-opts="scores" aria-label="Horizontal axis"></select>
+        <span class="tt-flabel">Up</span>
+        <select class="tt-select" data-bind="cy" data-opts="scores" aria-label="Vertical axis"></select>
+      </div>
+      <p class="tt-note" data-draw="comprubric"></p>
+      <div class="tt-chart" data-draw="compmap"></div>
+      <div data-draw="compgroups"></div>
+    </section>
+    <div class="tt-grid2" data-needs="competitors">
+      <section class="tt-card">
+        <div class="tt-card-head"><h2>Threat against partner potential</h2><p class="tt-note">Where each player sits: fight, watch, or work with.</p></div>
+        <div class="tt-quadwrap" data-draw="compquad"></div>
+      </section>
+      <section class="tt-card">
+        <div class="tt-card-head"><h2>Selected player</h2></div>
+        <p class="tt-nocsel" data-hide-if="csel">Click a player anywhere in this tab to see its full profile, including a dated list of recent moves.</p>
+        <div class="tt-detail" data-draw="compdetail"></div>
+      </section>
+    </div>
+    <section class="tt-card" data-needs="components">
+      <div class="tt-card-head"><h2>Coverage</h2><p class="tt-note">Each component checked against each player. Solid means it covers that part, faded means partly, grey means not at all. Sorted by threat.</p></div>
+      <div class="tt-chart" data-draw="compmatrix"></div>
+    </section>
+    <section class="tt-card" data-needs="competitors">
+      <div class="tt-card-head"><h2>Every profiled player</h2><p class="tt-note">Click a row for the full profile.</p></div>
+      <div class="tt-tablewrap">
+        <table class="tt-table tt-comptable">
+          <thead><tr><th data-sortable="c" aria-sort="none"><button class="tt-sort" data-act="sort" data-scope="c">Player</button></th><th>Group</th><th class="tt-hide-narrow">Business model</th><th>Traction</th><th class="tt-hide-narrow">Funding</th><th>Threat</th><th>Partner</th></tr></thead>
+          <tbody data-draw="comprows" data-rowkey="csel"></tbody>
+        </table>
+      </div>
+    </section>
+    <section class="tt-card" data-needs="landscape">
+      <div class="tt-card-head"><h2>The long list</h2><p class="tt-note">Shorter entries from the first pass. Click a row for detail.</p></div>
+      <div class="tt-tablewrap">
+        <table class="tt-table tt-landtable">
+          <thead><tr><th>Name</th><th class="tt-hide-narrow">Who</th><th>Group</th><th>What</th><th class="tt-hide-narrow">Confidence</th></tr></thead>
+          <tbody data-draw="landrows" data-rowkey="csel"></tbody>
+        </table>
+      </div>
+    </section>
+  </section>
+
+  <!-- MARKET -->
+  <section class="tt-page" data-page="market" id="market" hidden>
+    <section class="tt-card">
+      <div class="tt-card-head">
+        <h2 data-text="market.title"></h2>
+        <p class="tt-note"><b data-draw="supplycount">0</b> sources match. Below the supply sit the demand segments and the dependencies between them.</p>
+      </div>
+      <div class="tt-jump"><button class="tt-btn" data-jump="mk-supply">Supply</button><button class="tt-btn" data-jump="mk-demand">Demand</button></div>
+    </section>
+    <section class="tt-card tt-filters" aria-label="Market filters" id="mk-supply">
+      <div class="tt-row">
+        <span class="tt-flabel">Filter</span>
+        <select class="tt-select" data-bind="sdom" data-opts="domains" aria-label="Domain"></select>
+        <select class="tt-select" data-bind="stier" data-opts="tiers" aria-label="Access tier"></select>
+        <select class="tt-select" data-bind="sfit" data-opts="fits" aria-label="Fit"></select>
+        <select class="tt-select" data-bind="sconf" data-opts="conf" aria-label="Confidence"></select>
+        <input class="tt-q" type="search" data-q="sq" placeholder="Search sources" aria-label="Search sources">
+        <button class="tt-btn" data-act="market-clear">Clear filters</button>
+      </div>
+    </section>
+    <div class="tt-grid2">
+      <section class="tt-card">
+        <div class="tt-card-head"><h2>Supply: domain by access tier</h2><p class="tt-note">Count of sources in each cell. Click a cell to filter the list below.</p></div>
+        <div class="tt-chart" data-draw="supplymatrix"></div>
+      </section>
+      <section class="tt-card">
+        <div class="tt-card-head"><h2>Fit by domain</h2><p class="tt-note">Click a segment to filter.</p></div>
+        <div class="tt-chart" data-draw="fitbars"></div>
+        <ul class="tt-legend" data-draw="fitlegend"></ul>
+      </section>
+    </div>
+    <section class="tt-card">
+      <div class="tt-card-head"><h2>Selected source</h2></div>
+      <p class="tt-nossel" data-hide-if="ssel">Click a source in a list to see its access model, pricing and terms.</p>
+      <div class="tt-detail" data-draw="supplydetail"></div>
+    </section>
+    <section class="tt-card">
+      <div class="tt-card-head"><h2>Every source</h2><p class="tt-note">Picking a demand segment below narrows this list to the sources that segment depends on.</p></div>
+      <div class="tt-tablewrap">
+        <table class="tt-table tt-supplytable">
+          <thead><tr><th>Source</th><th>Domain</th><th>Access</th><th class="tt-hide-narrow">Pricing</th><th class="tt-hide-narrow">Commercial use</th><th>Fit</th></tr></thead>
+          <tbody data-draw="supplyrows" data-rowkey="ssel"></tbody>
+        </table>
+      </div>
+    </section>
+    <div class="tt-grid2" id="mk-demand">
+      <section class="tt-card">
+        <div class="tt-card-head"><h2>Demand: who would use it</h2><p class="tt-note">Segments ranked by priority, zero to five. Click one for its profile.</p></div>
+        <div class="tt-chart" data-draw="demandbars"></div>
+      </section>
+      <section class="tt-card">
+        <div class="tt-card-head"><h2>Selected segment</h2></div>
+        <p class="tt-noseg" data-hide-if="seg">Click a segment to see its size, budget, pains, channels and willingness to pay.</p>
+        <div class="tt-detail" data-draw="demanddetail"></div>
+      </section>
+    </div>
+    <section class="tt-card">
+      <div class="tt-card-head"><h2>Who depends on what</h2><p class="tt-note">Number of mapped sources each segment depends on, per domain. Click a cell to see those sources.</p></div>
+      <div class="tt-chart" data-draw="sdmatrix"></div>
+    </section>
+  </section>
+
+  <!-- DEEP DIVE -->
+  <section class="tt-page" data-page="deepdive" id="deepdive" hidden>
+    <div data-band="deepdive" hidden></div>
+    <section class="tt-card">
+      <div class="tt-lib">
+        <aside class="tt-lside">
+          <input class="tt-q" type="search" data-q="lq" placeholder="Search every report" aria-label="Search every report">
+          <div data-draw="libdocs"></div>
+        </aside>
+        <div>
+          <div data-draw="libhits"></div>
+          <div data-draw="libreader"></div>
+        </div>
+      </div>
+    </section>
+  </section>
+</div>
+<script id="bundle" type="application/json">__BUNDLE__</script>
+<script>
+/*__D3__*/
+</script>
+<script>
+/*__SHIM__*/
+</script>
+<script>
+/*__CORE__*/
+</script>
+<script>
+/*__TIMELINE__*/
+</script>
+<script>
+/*__GTM__*/
+</script>
+<script>
+/*__COMPETITION__*/
+</script>
+<script>
+/*__MARKET__*/
+</script>
+<script>
+/*__LIBRARY__*/
+</script>
+<script>
+/*__IMPACT__*/
+</script>
+<script>
+/*__MOVES__*/
+</script>
+<script>
+window.tt.init();
+</script>
+</body>
+</html>
