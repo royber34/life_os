@@ -103,6 +103,17 @@ const has = n => new RegExp('\\.' + n.replace(/[:\/.\[\]()]/g, c => '\\\\' + c).
 // tailwind.design.js
 import base from './tailwind.config.js'
 
+// Derive the colour list from the theme rather than retyping it. Nested scales
+// expand to `name-key`; DEFAULT collapses to the bare name.
+const colors = [
+  ...Object.entries(base.theme.extend.colors).flatMap(([name, value]) =>
+    typeof value === 'string'
+      ? [name]
+      : Object.keys(value).map(k => (k === 'DEFAULT' ? name : `${name}-${k}`))),
+  'white', 'transparent', 'current',
+]
+const spacing = ['0', '1', '2', '3', '4', '6', '8', '12', '16', '20', '24', '32', '48', '64']
+
 export default {
   ...base,
   safelist: [
@@ -115,6 +126,10 @@ export default {
 ```
 
 Mine went from 18 KB to 62 KB, which is nothing for the environment it ships to, and the site build was left untouched.
+
+Derive that colour list, do not retype it. I shipped a hand-written copy first, and it is the same class of bug as the three above: a colour added to the theme styles the site correctly and is inert in every design, silently. Deriving it makes that impossible rather than merely documented.
+
+Be honest with yourself about what the safelist costs, though. It converts a silent-failure bug into a maintenance surface: the spacing, type and layout lists stay hand-written and finite, so they can still fall behind what the agent plausibly writes. If designs come back with unstyled patches, that is where to look first.
 
 **Then tell the agent the boundary exists.** A safelist is finite, so arbitrary values (`p-[13px]`, `bg-[#123456]`) still silently fail. That belongs in the conventions doc explicitly, along with what to do instead (inline `style` for one-off values).
 
