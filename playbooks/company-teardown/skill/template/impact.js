@@ -34,8 +34,14 @@
     const part = mk('div', 'tt-part');
     part.append(mk('span', 'tt-part-kicker', 'Marketing and sales'), mk('h2', null, ins.heading || 'What has worked, what has not, and where the openings are'));
     el.append(part);
-    if (ins.summary) el.append(mdInto('tt-verdict tt-prose tt-insight-sum', ins.summary));
+    if (ins.summary) {
+      const f = mk('details', 'tt-top-more');
+      f.append(mk('summary', null, 'In a few sentences'), mdInto('tt-prose', ins.summary));
+      el.append(f);
+    }
     if ((ins.stats || []).length) {
+      const fold = mk('details', 'tt-card tt-fold');
+      fold.append(mk('summary', null, `All key numbers (${ins.stats.length})`));
       const s = mk('div', 'tt-facts');
       for (const h of ins.stats) {
         const c = mk('div', 'tt-kpi tt-fact');
@@ -43,7 +49,8 @@
         if (h.kind) c.append(mk('span', 'tt-tag', h.kind));
         s.append(c);
       }
-      el.append(s);
+      fold.append(s);
+      el.append(fold);
     }
     const tableCard = (t, open) => {
       const sec = mk('details', 'tt-card tt-fieldtable');

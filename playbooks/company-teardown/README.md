@@ -1,6 +1,6 @@
 # Company Teardown: reverse-engineer any company into one checked, interactive page
 
-A Claude Code skill that takes a company name and produces a sourced research archive plus one self-contained HTML page. The page opens on what to do: the moves, opportunities, and what's working and what isn't. Behind that sit an overview, a dated timeline, go-to-market insights with campaign impact, competition and a deep dive. Agents do the research in parallel, independent agents check it, and the page tells you how far to trust it.
+A Claude Code skill that takes a company name and produces a sourced research archive plus one self-contained HTML page. The page opens on an overview, then what to do: the moves, opportunities, and what's working and what isn't. Behind that sit a dated timeline, go-to-market insights with campaign impact, an AI section (a GEO audit plus inferred AI use), competition with 10-year charts against rivals, and a deep dive. Agents do the research in parallel, independent agents check it, and the page tells you how far to trust it.
 
 I built this after reverse-engineering [treg](https://treg.to) by hand with Claude. The result was good, and the audit of how it got made was humbling. Five of the six main sections only existed because I asked for them after seeing earlier output. Agents went silent for hours and nobody noticed until I asked. (The cause turned out to be my laptop going into standby: the system log matched both long hangs to the minute.) About 2% of the rows were checked, all hand-picked, so the true error rate was unknown. Claude never saw the page it built, so I did the QA. This playbook is what I'd set up from the start next time.
 
@@ -34,8 +34,9 @@ There's also a probe-only mode, which tells you cheaply what a full run would fi
 - **It measures its own error rate.** Every claim the conclusions rest on is checked, plus a random sample of at least 100 others. The page shows a label and a range. One wrong row in 40 checks still allows a true rate up to 13%, so the range matters more than the point estimate.
 - **It survives a dead session.** All state is on disk, each item is saved before the next starts, and a watcher tells a stuck agent from a shared outage.
 - **It sees its own output.** A script opens the page, clicks every tab, compares counts with the data and takes screenshots.
-- **It tells you what to do.** Moves come first, each with evidence, a decision rule, a test and what happens if it's wrong. Weak evidence blocks a claim of fact, and doesn't block a cheap, labelled test.
+- **It tells you what to do.** The moves sit right after the overview, each with evidence, a decision rule, a test and what happens if it's wrong. Weak evidence blocks a claim of fact, and doesn't block a cheap, labelled test.
 - **It gives a marketing and sales team something to use.** By channel, angle, offer, format, product, timing, audience and sales route: what's working, what isn't, where the openings are, and when to stop.
+- **It shows the long view against rivals.** Search, Wikipedia, Reddit and YouTube history, up to 10 years, on one time axis, with charts and brands added or removed by clicking. Reddit counts are adjusted for forum growth and checked by reading titles by hand.
 - **It measures campaigns honestly.** Each is compared with the weeks before, the same weeks a year earlier and the same weeks at rivals, and it says how large an effect the data could even see.
 - **It says what would make it better.** It lists the connections, such as ad accounts, CRM and order data, that would turn public signals into measured results.
 - **It ends with action:** the cheapest real-world test of the conclusion, and who to call with what questions. Nobody gets contacted by the run.
@@ -55,14 +56,15 @@ You can also scope a run to one brand or market. These ranges are guides. The pu
 
 - **One full run,** on a consumer brand, including the deeper passes and the review panel. Many of its fixes were made along the way, and are now in the playbook.
 - **One smaller cold-start test,** on a software company from the written instructions alone: research on two workstreams, moves, insights, a campaign study and the page, with the checks self-marked. It found real problems, which are fixed. It didn't exercise background agents, independent verifiers or the review panel on that target.
-- **Automated:** 96 pipeline tests, plus browser checks on each built page.
+- **Automated:** 101 pipeline tests, plus browser checks on each built page.
+- **AI section:** the GEO audit and AI-use workstreams have run once, on the consumer brand. Their counts and claims were checked in full by fresh verifiers.
 
 So expect a consumer run to work as described. Expect other company types to work, with more judgement along the way. A full run on a second company hasn't been done yet.
 
 ## What it costs
 
 From one full consumer run, so treat these as rough:
-- **Paid data:** USD 1.53 on that run, against a default cap of USD 5.
+- **Paid data:** USD 1.53 for the main research, against a default cap of USD 5, and about USD 5 in all once the deeper passes, the AI section and the rivals history were added.
 - **Work:** many hours of agent time, with model usage the real cost, and it is large. That run's total went well past the 3 to 4 active hours first planned. Use probe-only first if you're unsure.
 - **You:** a review at each of the five gates.
 

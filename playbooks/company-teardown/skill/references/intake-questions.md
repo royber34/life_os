@@ -10,7 +10,7 @@ Ask these in one message, each with its default. Skip anything the user's notes 
 
 4. **How deep?** Default: a dated event log with a source on every row, plus written sections. The first full run on treg produced over a thousand rows, and a company with less public material will produce far fewer.
 
-5. **Output?** Default: the interactive page, opening on the moves (SWOT, what to double down on, quick wins, budget shifts, bigger bets), then overview, so what, timeline, go-to-market, competition and deep dive, plus a one-page decision memo. Status and so what are kept apart.
+5. **Output?** Default: the interactive page, opening on the overview (with the SWOT), then so what (what to double down on, quick wins, budget shifts, bigger bets), timeline, go-to-market, AI, competition and deep dive, plus a one-page decision memo. Status and so what are kept apart.
 
 6. **Which paid data may it use, and how much?** Default: treg if connected, up to USD 5 for the run, nothing above USD 0.30 per call. The run reports what it could not get at that level.
 

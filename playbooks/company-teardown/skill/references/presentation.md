@@ -1,6 +1,6 @@
 # Presentation layer
 
-The page is one self-contained HTML file built from `dashboard/bundle.json`. It makes no network requests. Tabs, in order: So what, opening on the moves when `prose.moves` is set, then Overview, Timeline, Go-to-market, Competition, Market (only when `config.market` is set), Deep dive.
+The page is one self-contained HTML file built from `dashboard/bundle.json`. It makes no network requests. Tabs, in order: Overview, So what (the moves, when `prose.moves` is set), Timeline, Go-to-market, AI (only when `prose.ai` is set), Competition, Market (only when `config.market` is set), Deep dive.
 
 ## Build steps
 
@@ -62,6 +62,10 @@ python "<skill>/scripts/render_test.py" "<run>/dashboard/index.html" "<run>/dash
 
 All of `headlines`, `answer.body`, `rules`, `swot`, `items`, `data_request`, `opportunities`, `working` and `not_working` are required once `prose.moves` exists. `when` values are short timing groups, such as Time-sensitive or Near term, and never assign work. The validator rejects an incomplete move, a bad type, confidence or score, a budget move with no `from` and `to`, an empty SWOT quadrant, a crossing that names a missing move, fewer than 3 headlines, a priority move with no trigger, and second person in the moves text. Priority moves show as cards. The rest stay on the page in an expanded view, and a jump to one opens it. Older bundles with no `prose.moves` still build and open on Overview.
 
+## Plain fields on a move
+
+Each move should carry `found`, `matters` and `idea`. The card shows these three, with `what`, `why`, `money`, `trigger`, `check_first`, `test`, `watch` and `if_wrong` in a fold. A move without `found` falls back to `what`. Rules are in `references/moves.md`.
+
 ## Insights, impact and connections
 
 - `prose.gtm.insights`: `{heading, summary, stats[], brief{heading,note,rows}, lenses[{id,label,intro,working[],not[],open[]}], tables[{id,title,note,columns,rows}]}`. Items are `{title, evidence, use, measure, proof}`. Opens the Go-to-market tab.
@@ -71,6 +75,63 @@ All of `headlines`, `answer.body`, `rules`, `swot`, `items`, `data_request`, `op
 - `prose.moves.opportunities`, `working`, `not_working`: items are `{title, evidence, use, proof, moves[]}`.
 
 A section with `hidden` in its markup never draws, since the runtime skips hidden parents. Unhide it at load time, as `moves.js` and `impact.js` do.
+
+## Top of each tab
+
+`prose.top.<tab>` opens a tab. Readers decide here whether to go further, so write it last, and keep it visual. The old `bands` text moves into a small fold beneath.
+
+- `headline`: one plain sentence under 20 words, stating the main so what.
+- `points[]`: usually four, at most five, each with:
+  - `so`: the takeaway in a few words. This line is what the reader remembers.
+  - `value`: the number or short quote.
+  - `viz`: optional, one of `dots{n,d}`, `pips{n,names}`, `bars{rows[{label,value,text,focus}],max}`, `range{lo,hi,min,max,min_label,max_label,assumed}` or `share{part,whole}`.
+  - `label`: says exactly what was counted, in words a stranger follows, with citations. It shows above the picture.
+  - `means`: one or two sentences on what the number means for the business, and how far it can be trusted. Every number the reader sees needs this.
+  - `kind`: such as Measured, Estimate, Public record, or Method. Every number needs a citation, unless the kind is Method.
+  - `goto` and `goto_label`: `move:<id>`, `part:<id>`, `tab:<tab>`, `doc:<slug>` or `id:<tab>/<element id>`.
+- `doors[]`: chips to the next layer, `{label,goto}`. Leave these out if the tab already has filter chips.
+
+Test: each panel has to answer "what am I looking at, what was counted, what do I take away?" by itself. Never use shorthand that depends on knowing how the research was run. "Buyer names it" failed this: the reader couldn't tell that it meant AI answers to questions that mention the brand. Row stats and signal titles follow the same test, so they're sentences and never labels.
+
+Write `value` and `label` so they read as one sentence: "0 of 3 | repair questions are answered on the warranty page". Don't compare unlike things, such as answers to different questions, in one chart. Prefer a plain number to an obscure rate, and name any company the first time it appears.
+
+Rules: no gauges for judgement scores, since they make a judgement look measured. Use `assumed: true` for modelled ranges, which draws a dashed bar. A single fact can stay as text with no chart. Don't use alarm colours, since the evidence rarely supports alarm.
+
+## Rows, not cards
+
+Moves and AI findings are one-line rows that open on click, so a reader scans the list in seconds and nothing is lost. Each row shows the title, a short `stat` with its citation, impact and effort pips, and timing. Main areas also show `idea`, because a reader who sees only titles doesn't get the point. Everything else sits in the row. Further moves sit in a visible fold right under the main ones, named with their count, since a chip alone was easy to miss. Sections below the list stay closed, with counts in their titles. The SWOT goes on the Overview, above the trust section: its points show, and each so what opens on click.
+
+## Rivals over time
+
+`prose.compare` is optional, and adds a chart section at the top of the Competition tab, with one shared time axis.
+
+- `heading`, `intro`, `default_from` (`YYYY-MM`).
+- `brands[{id,label,focus,on}]`: mark the target with `focus: true`.
+- `indicators[{id,label,short,what,note,on}]`: `what` says in plain words what's measured, and `note` holds limits and citations. Use one source per indicator, and never mix vendors. Set `on` for the charts shown first.
+- `series.<indicator>.<brand>`: `[["YYYY-MM", value], ...]`. A missing month stays missing. It breaks the line, so a gap never reads as a trend. An indicator with `step: "year"` holds one value per year, dated `YYYY-07`: use it for small counts, where single months are noise.
+
+An indicator may carry `shade[{from,to,label}]`, for months that look unreliable: they stay visible and are left out of the scale. Check series before plotting: put terms in one Trends request or rescale on a shared anchor, cut months where a vendor's method changed, and leave out any brand whose domain covers far more than the product. Readers click chips to add or remove charts and brands. They can switch between actual values and change since the start.
+
+Community history, for consumer brands:
+
+- **Reddit:** count posts with the brand in the title inside the category's main forum (r/ebikes for e-bikes, say), month by month, using the free Arctic Shift archive (`arctic-shift.photon-reddit.com/api/posts/search`).
+  - Listing posts one month at a time works where its counting endpoint times out. Check the two methods against each other on months where both exist.
+  - Fetch the forum's total posts one month per request. Plot posts per 10,000, since forums grow a lot.
+  - Read about 25 random titles per brand by hand to check precision. Combine spellings, such as e-bike, e bike and ebike.
+  - Never use site-wide bare words: a brand named after a common word or a sport is mostly about that word.
+  - Compare three-year blocks, because one base year can flip the story.
+- **YouTube:** Google Trends with `gprop=youtube` gives 10 years of search interest. Show yearly means, since small terms round to whole numbers.
+
+No free source gave multi-year counts for news, TikTok, Instagram or forums outside Reddit (GDELT refused calls, and Trends' news property returned zeros), so say so on the page rather than leave a chart out silently.
+
+## AI tab
+
+`prose.ai` is optional. When present, the AI tab appears after Go-to-market.
+
+- `heading`, `body`, `stats[{value,label}]`, `score_tables[]`.
+- `parts[{id,title,intro,findings[{title,found,matters,idea}],swot{strengths,weaknesses,opportunities,threats},tables[]}]`, normally `offsite`, `technical` and `content`.
+- `uses{title,intro,items[],tables[]}`. Each item has `top`, `title`, `idea`, `effort`, `impact`, `evidence`, `gap`, `comparables`, `tools`, `data`, `risks`, `test`. All are shown as inferred. Items with `top` show first, and the rest fold away.
+- A table is `{id,title,note,columns,rows}`, and cells may hold citations.
 
 ## Verification block
 

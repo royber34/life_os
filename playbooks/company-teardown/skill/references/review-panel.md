@@ -10,6 +10,10 @@ Fresh agents in parallel, one per role, each blind to the others and to your vie
 
 Give each one the page through its screenshots, in reading order, plus `09-moves.md`. Give the CFO the economics section and the ledger. Give the analyst the ledger, verdicts, corrections and report, and have them test by doing: check a stated random draw of citations, say which rows the error rate covers, and assess each chart.
 
+## Plain-reader test
+
+Before the role panel, run two fresh readers one after the other on the moves and the AI findings, with citations stripped and no background. Ask each to score every item for clarity from 1 to 5, quote the words that lost them, and list figures with no basis and reasons that don't follow. Fix what they find, and check each rewording against its source. Also give a cold reader screenshots of each tab's top, and for each panel ask what was counted and what they take away. Their answers show misreadings that scores miss. A role panel praises a page that a plain reader can't follow, so this runs first. On the first run, it found ten of 25 moves unclear after a panel-approved rewrite.
+
 ## The brief
 
 > You are the [role] of a [kind of company]. Someone outside hands you a page about the business, built only from public sources. Review it cold. Judge how useful the insights are for your decisions, how well founded they seem and where you'd stop believing, and how easy it is, structurally and visually, to see the points. Be blunt, praise only what earns it, and name the exact spot for each point.

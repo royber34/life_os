@@ -1,6 +1,6 @@
 ---
 name: company-teardown
-description: Reverse-engineers any company into a sourced, independently checked research archive and one self-contained interactive HTML presentation that opens on what to do (SWOT, what to double down on, quick wins, budget shifts, bigger bets), backed by an overview, a so what, a dated timeline, go-to-market, competition and a deep dive. Runs parallel research agents, checks what the company exposes before spending, uses treg and other data tools when available, measures its own error rate, and stops for the user's approval at five gates. Use when the user asks for a company teardown, deep dive, reverse-engineering or competitive profile of a company or brand, wants a timeline of how a company got here, or asks to continue or refresh an earlier teardown. Works for developer tools, private companies, listed companies and consumer brands.
+description: Reverse-engineers any company into a sourced, independently checked research archive and one self-contained interactive HTML presentation that opens on an overview, then what to do (SWOT, what to double down on, quick wins, budget shifts, bigger bets), backed by a dated timeline, go-to-market, competition and a deep dive. Runs parallel research agents, checks what the company exposes before spending, uses treg and other data tools when available, measures its own error rate, and stops for the user's approval at five gates. Use when the user asks for a company teardown, deep dive, reverse-engineering or competitive profile of a company or brand, wants a timeline of how a company got here, or asks to continue or refresh an earlier teardown. Works for developer tools, private companies, listed companies and consumer brands.
 ---
 
 # company-teardown
@@ -29,7 +29,7 @@ The disk is the only run state. Every stage writes files, so a dead session lose
 | S1 Probe | `01-probe.md`, `probe.json`, `treg-plan.json`, `config.json`, 10 sample events | **G1:** modules, expected depth and cost |
 | S2 Research | `research/<ws>/*`, `02-coverage.md` | **G2:** coverage and gaps: backfill or go on |
 | S3 Verify | `verify/*`, including the measured error rate | Internal thresholds; the user sees the result |
-| S3b Deeper passes | `research/w9-*` and up, checked: moves pass, performance pass, campaign study | Internal; report spend and gaps to the user |
+| S3b Deeper passes | `research/w9-*` and up, checked: moves pass, performance pass, campaign study, treg gap audit, GEO and AI use | Internal; report spend and gaps to the user |
 | S4 Synthesis | `03` to `08`, `09-moves.md`, optional `09-lens.md`, `verify/synthesis-review.md` | **G3:** the moves, the memo and the so what |
 | S5 Present | `dashboard/index.html`, `dashboard/screens/` with screenshots and `render-report.md` | **G4:** the user opens the page |
 | S6 Close | `raw-research-README.md`, `cost-report.md`, freshness note | None |
@@ -94,7 +94,10 @@ After S3, and before writing anything. Read `references/moves.md`, `references/i
 1. Run the moves pass and the performance pass as background agents, with the briefs in `references/performance-briefs.md`, at most six in all. Use the watcher and keep-awake as in S2. Check folders named `w9-*` and up.
 2. Run `merge_events.py`, then `ledger.py merge`. Keep the first-pass error rate separate.
 3. Check moves-pass rows with a random sample of 20 per workstream, and performance-pass rows in full, using fresh verifiers and the additions in `references/performance-briefs.md`. Fix or downgrade what fails, and log it in `verify/corrections.jsonl`.
-4. Report to the user in plain words what was reached and what wasn't.
+4. Run the treg gap audit in `references/treg.md`, and fill what it finds.
+5. Run the GEO and AI-use workstreams in `references/geo-ai.md`, if the brief includes the AI section, and check them in full.
+6. Update any finding the new evidence contradicts, and tell the user which.
+7. Report to the user in plain words what was reached and what wasn't.
 
 A probe-only run skips this. If the brief caps the run at basic research, say what the page will lack.
 
@@ -106,7 +109,7 @@ Read `references/synthesis.md`. You write these yourself, from the verified mate
 - `04-so-what.md`: what it means and what to do with it.
 - `05-gtm.md`, `06-competition.md`, `07-deep-dive.md`.
 - `08-decision-memo.md`: one page, answering the question from the brief.
-- `09-moves.md`: what to do, and the page's opening tab. Follow `references/moves.md` and `references/insights.md`, using the evidence from S3b.
+- `09-moves.md`: what to do, and the page's second tab, after the overview. Follow `references/moves.md` and `references/insights.md`, using the evidence from S3b.
 - `09-lens.md`: only when the brief names a lens question.
 
 Separate evidence strength from advice strength. Weak evidence blocks a statement of fact, and it does not block a cheap, reversible move labelled as a test.
@@ -149,6 +152,7 @@ End with what the user should do next, in order: the cheapest real-world test of
 | `references/schemas.md` | Whenever writing or checking data files |
 | `references/verification.md` | S3, S4 |
 | `references/moves.md`, `references/insights.md`, `references/performance-briefs.md` | S3b, S4 |
+| `references/geo-ai.md` | S3b, when the brief includes the AI section |
 | `references/synthesis.md` | S4 |
 | `references/presentation.md`, `references/review-panel.md` | S5 |
 | `references/templates.md`, `references/style.md` | As needed |

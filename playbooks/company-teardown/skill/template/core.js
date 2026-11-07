@@ -154,11 +154,11 @@ window.tt = (() => {
   };
 
   // Tab navigation used by nav cards, prose and doc links.
-  const TABS = ['overview', 'sowhat', 'timeline', 'gtm', 'competition', 'market', 'deepdive'];
-  const TABLABEL = { overview: 'Overview', sowhat: 'So what', timeline: 'Timeline', gtm: 'Go-to-market', competition: 'Competition', market: 'Market', deepdive: 'Deep dive' };
+  const TABS = ['overview', 'sowhat', 'timeline', 'gtm', 'ai', 'competition', 'market', 'deepdive'];
+  const TABLABEL = { overview: 'Overview', sowhat: 'So what', timeline: 'Timeline', gtm: 'Go-to-market', ai: 'AI', competition: 'Competition', market: 'Market', deepdive: 'Deep dive' };
   const hasMoves = () => !!((B.prose || {}).moves);
-  const firstTab = () => (hasMoves() ? 'sowhat' : 'overview');
-  const liveTabs = () => TABS.filter((t) => t !== 'market' || CFG.market);
+  const firstTab = () => 'overview';
+  const liveTabs = () => TABS.filter((t) => (t !== 'market' || CFG.market) && (t !== 'ai' || (B.prose || {}).ai));
   const goTo = (raw) => {
     const target = raw === 'moves' ? 'sowhat' : raw;
     if (String(target).startsWith('doc:')) {
@@ -234,7 +234,7 @@ window.tt = (() => {
       n.textContent = key === 'name' ? META.name : key === 'lede' ? META.lede : key === 'market.title' ? (CFG.market || {}).title || '' : '';
     }
     const nav = document.querySelector('.tt-tabs');
-    const tabOrder = hasMoves() ? ['sowhat', ...liveTabs().filter((t) => t !== 'sowhat')] : liveTabs();
+    const tabOrder = liveTabs();
     for (const t of tabOrder) {
       const b = mk('button', 'tt-tab', TABLABEL[t]);
       b.dataset.tab = t;
@@ -338,6 +338,8 @@ window.tt = (() => {
     const v = B.verification;
     if (!v) {
       const c = mk('section', 'tt-card tt-verify tt-verify-none');
+      const trust = document.getElementById('trust');
+      if (trust) trust.open = true;
       c.append(mk('h2', null, 'Not verified yet'), mk('p', 'tt-note', VERIFY_CAVEAT), mk('p', 'tt-note', 'No independent check of these claims has run. Treat every number and date here as unchecked.'));
       el.append(c);
       return;
@@ -398,6 +400,7 @@ window.tt = (() => {
       ['sowhat', 'The moves, then opportunities, then what is working and what is not, with the competing readings.'],
       ['timeline', `Every dated event in ${(T.LANES || []).length} lanes, with growth charts on the same axis.`],
       ['gtm', 'Each launch, campaign, post and offer in order, sized by reach, against the traction it moved.'],
+      ...((B.prose || {}).ai ? [['ai', 'How AI answer engines see the company, and inferred areas for using AI inside it.']] : []),
       ['competition', `${d3.format(',')(c.competitors || 0)} players profiled, scored and rated for threat and partner potential.`],
       ...(CFG.market ? [['market', 'Who supplies the adjacent market, on what terms, and who would buy.']] : []),
       ['deepdive', 'Every report in full, searchable, with sources.'],

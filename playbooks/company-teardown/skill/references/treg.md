@@ -21,6 +21,24 @@ The catalog changes, so never hardcode endpoint ids. In the probe:
 
 If search finds nothing, record "none", go to a free source, and consider `catalog_request` to file the gap.
 
+## Use it as far as it reaches
+
+Every data need starts with `catalog_search`, including needs a workstream could meet with a plain fetch or web search. treg often returns raw data where a fetch returns a summary or a refusal. A refusal, timeout or empty result from one provider isn't a gap until the other providers listed have been tried. A gap is recorded with each provider tried and why it failed.
+
+Name needs that require the team's own key, check `my_tools` and the existing config for that key, and tell the user what it would add. Never ask for the key itself.
+
+### Gap audit
+
+After the moves and performance passes, run a gap audit. List each gap and refusal from every `section.md`, map it to the catalog, and call what's there. On the first full run this found:
+- US Google ads running daily, which earlier reads had missed
+- complaint rankings that depend on which pool is counted
+- real refund figures at listed peers
+- retailers that were wrongly marked as unreachable
+
+Split it into two or three agents by subject (buyer voice and retailers; ads, filings and market data). The first single agent stopped at 31 calls when its working context ran out. Each agent saves raw responses to disk, keeps only a line or two in context, and counts with scripts. Check the results in full, since on the first run 4 of 158 new rows were wrong and 36 partly right.
+
+Ask for more where budget allows. Data is usually cheap against the decisions it informs: the whole audit cost under USD 1.
+
 ## Choosing and calling
 
 - Prefer endpoints with a `works` rate of at least 0.7 and at least 50 samples. Below that, use only with a second source.

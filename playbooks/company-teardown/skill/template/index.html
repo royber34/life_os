@@ -21,9 +21,26 @@
   <section class="tt-page" data-page="overview" id="overview" hidden>
     <div data-band="overview" hidden></div>
     <div class="tt-kpis" data-draw="kpis"></div>
-    <div data-draw="verification"></div>
-    <div data-draw="connections"></div>
     <div class="tt-grid3" data-draw="summary"></div>
+    <section class="tt-card" id="swot" data-has-moves hidden>
+      <div class="tt-card-head">
+        <h2>SWOT</h2>
+        <p class="tt-note">Click a point to see what follows from it.</p>
+      </div>
+      <div class="tt-swotgrid" data-draw="movesswot"></div>
+      <details class="tt-fold-inner">
+        <summary>Where the SWOT crosses: inside facts paired with outside ones</summary>
+        <div class="tt-crosses" data-draw="movescross"></div>
+      </details>
+    </section>
+    <details class="tt-card tt-fold" id="trust">
+      <summary><b>How far to trust this</b></summary>
+      <div data-draw="verification"></div>
+    </details>
+    <details class="tt-card tt-fold" id="connections">
+      <summary><b>What further data would add</b></summary>
+      <div data-draw="connections"></div>
+    </details>
     <div class="tt-grid3" data-draw="navcards"></div>
   </section>
 
@@ -31,62 +48,40 @@
   <section class="tt-page" data-page="sowhat" id="sowhat" hidden>
     <div data-band="sowhat" hidden></div>
     <div data-has-moves class="tt-page" hidden>
-      <div class="tt-part"><h2>The moves</h2></div>
-      <div data-draw="movesanswer"></div>
-      <section class="tt-card">
-        <div class="tt-card-head">
-          <h2>Identified areas at a glance</h2>
-          <p class="tt-note">Impact and effort are ranks from 1 to 5, comparing these areas with each other.</p>
-        </div>
-        <div class="tt-plan-wrap" data-draw="movesplan"></div>
+      <section class="tt-card" id="areas">
+        <div class="tt-card-head"><h2>The moves</h2></div>
+        <div data-draw="moveslist"></div>
       </section>
-      <div class="tt-page" data-draw="moveslist"></div>
-      <section class="tt-card">
-        <div class="tt-card-head">
-          <h2>How internal numbers could change the reading</h2>
-        </div>
+      <section class="tt-card" id="signals">
+        <div class="tt-card-head"><h2>Opportunities, and what's working</h2></div>
+        <div class="tt-signals" data-draw="sowsignals"></div>
+      </section>
+      <details class="tt-card tt-fold">
+        <summary><b data-fold-count="rules">How internal numbers could change the reading</b></summary>
         <div class="tt-plan-wrap" data-draw="movesrules"></div>
-      </section>
-      <section class="tt-card">
-        <div class="tt-card-head">
-          <h2>Impact against effort</h2>
-          <p class="tt-note">Relative judgement, with no dollar figures, since sales and spend are not public.</p>
-        </div>
-        <div data-draw="movesmatrix"></div>
-      </section>
-      <section class="tt-card">
-        <div class="tt-card-head">
-          <h2>Data that would settle these</h2>
-          <p class="tt-note">What only the company holds, and what each item bears on.</p>
-        </div>
+      </details>
+      <details class="tt-card tt-fold">
+        <summary><b data-fold-count="data_request">Data that would settle these</b></summary>
+        <p class="tt-note">What only the company holds, and what each item bears on.</p>
         <div class="tt-plan-wrap" data-draw="movesrequest"></div>
-      </section>
-      <div class="tt-part"><h2>Opportunities</h2></div>
-      <div class="tt-insight-grid" data-draw="sowopps"></div>
-      <div class="tt-part"><h2>What's working and what isn't</h2></div>
-      <div class="tt-lens-grid tt-two" data-draw="sowworking"></div>
-      <div class="tt-part"><h2>The evidence and the fuller reading</h2></div>
-      <div class="tt-facts" data-draw="movesfacts"></div>
-      <section class="tt-card">
-        <div class="tt-card-head">
-          <h2>SWOT</h2>
-          <p class="tt-note">Each point says what follows from it and how the fact was sourced. Evidence is medium unless marked.</p>
-        </div>
-        <div class="tt-swotgrid" data-draw="movesswot"></div>
-      </section>
-      <section class="tt-card">
-        <div class="tt-card-head">
-          <h2>Where the SWOT crosses</h2>
-          <p class="tt-note">Each pairs an inside fact with an outside one, and leads to moves.</p>
-        </div>
-        <div class="tt-crosses" data-draw="movescross"></div>
-      </section>
+      </details>
+      <details class="tt-card tt-fold">
+        <summary><b>The summary, and the dates that bear on it</b></summary>
+        <div data-draw="movesanswer"></div>
+      </details>
+      <details class="tt-card tt-fold">
+        <summary><b data-fold-count="headlines">Key facts</b></summary>
+        <div class="tt-facts" data-draw="movesfacts"></div>
+      </details>
     </div>
-    <div class="tt-page" data-draw="sowhat"></div>
-    <section class="tt-card" data-has-moves hidden>
-      <div class="tt-card-head"><h2>What this cannot show</h2></div>
+    <details class="tt-card tt-fold" data-readings>
+      <summary><b>The fuller reading, with competing explanations</b></summary>
+      <div class="tt-page" data-draw="sowhat"></div>
+    </details>
+    <details class="tt-card tt-fold" data-has-moves hidden>
+      <summary><b>What this cannot show</b></summary>
       <div class="tt-prose" data-draw="moveslimits"></div>
-    </section>
+    </details>
   </section>
 
   <!-- TIMELINE -->
@@ -222,8 +217,19 @@
   </section>
 
   <!-- COMPETITION -->
+  <section class="tt-page" data-page="ai" id="ai" hidden>
+    <div data-band="ai" hidden></div>
+    <div class="tt-page" data-draw="aiparts"></div>
+  </section>
   <section class="tt-page" data-page="competition" id="competition" hidden>
     <div data-band="competition" hidden></div>
+    <section class="tt-card" id="compare" data-needs-compare hidden>
+      <div class="tt-card-head">
+        <h2 data-draw="comparehead">Against rivals over time</h2>
+        <div class="tt-note tt-prose" data-draw="compareintro"></div>
+      </div>
+      <div class="tt-cmp" data-draw="compare"></div>
+    </section>
     <div class="tt-part">
       <span class="tt-part-kicker">Competition</span>
       <h2>The key players</h2>
@@ -396,6 +402,12 @@
 </script>
 <script>
 /*__IMPACT__*/
+</script>
+<script>
+/*__COMPARE__*/
+</script>
+<script>
+/*__AI__*/
 </script>
 <script>
 /*__MOVES__*/

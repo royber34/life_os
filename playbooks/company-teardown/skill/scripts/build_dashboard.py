@@ -16,7 +16,7 @@ from pathlib import Path
 MAX_BYTES = 5 * 1024 * 1024
 EM_DASH = "\u2014"
 TEMPLATE = Path(__file__).resolve().parent.parent / "template"
-TABS = ["moves", "overview", "sowhat", "timeline", "gtm", "competition", "market", "deepdive"]
+TABS = ["moves", "overview", "sowhat", "timeline", "gtm", "ai", "competition", "market", "deepdive"]
 FAMILIES = {"product", "growth", "money", "people", "risk", "turning_point"}
 KPI_AGGS = {"last", "sum7", "max", "stat"}
 FORMATS = {"int", "usd", "pct", "text", "compact"}
@@ -717,7 +717,7 @@ LEVELS = {"high", "medium", "low"}
 EVIDENCE_LEVELS = {"strong", "medium", "thin"}
 PRESCRIPTIVE = ("written for", "first job", "the company should", "the company can", "whoever runs", "what to do first", "first thing")
 SOURCE_KINDS = {"Measured", "Public record", "Vendor estimate", "Assumed model", "Judgement", "Mixed"}
-BAND_TABS = {"overview", "sowhat", "timeline", "gtm", "competition", "market", "deepdive"}
+BAND_TABS = {"overview", "sowhat", "timeline", "gtm", "ai", "competition", "market", "deepdive"}
 
 
 def check_moves(prose, docs, market, problems):
@@ -725,6 +725,40 @@ def check_moves(prose, docs, market, problems):
     for tab in prose.get("bands") or {}:
         if tab not in BAND_TABS:
             problems.append(f"prose.bands: {tab} is not a tab with a band")
+    for tab, top in (prose.get("top") or {}).items():
+        if tab not in BAND_TABS:
+            problems.append(f"prose.top: {tab} is not a tab with a top")
+        if not (top or {}).get("headline"):
+            problems.append(f"prose.top.{tab}: headline is required")
+        if len((top or {}).get("points") or []) > 5:
+            problems.append(f"prose.top.{tab}: use at most 5 key points")
+        for pt in (top or {}).get("points") or []:
+            for key in ("value", "label", "kind"):
+                if not pt.get(key):
+                    problems.append(f"prose.top.{tab}: a key point needs {key}")
+            if pt.get("viz") and pt["viz"].get("type") not in ("dots", "pips", "bars", "range", "share"):
+                problems.append(f"prose.top.{tab}: unknown viz {pt['viz'].get('type')}")
+            text = f"{pt.get('value', '')} {pt.get('label', '')}"
+            if pt.get("kind") != "Method" and any(ch.isdigit() for ch in re.sub(r"\[c:[^\]]+\]", "", text)) and "[c:" not in text:
+                problems.append(f"prose.top.{tab}: a number needs a citation: {str(pt.get('value'))[:30]}")
+    def needs_cite(text):
+        return any(ch.isdigit() for ch in text) and "[c:" not in text
+    for m in (prose.get("moves") or {}).get("items") or []:
+        if m.get("stat") and needs_cite(m["stat"]):
+            problems.append(f"prose.moves.items {m.get('id')}: stat has a number with no citation")
+    ai = prose.get("ai")
+    if ai is not None:
+        if not ai.get("body"):
+            problems.append("prose.ai: body is required")
+        for part in ai.get("parts") or []:
+            for f in part.get("findings") or []:
+                for key in ("title", "found", "matters"):
+                    if not f.get(key):
+                        problems.append(f"prose.ai.parts.{part.get('id')}: a finding needs {key}")
+        for u in (ai.get("uses") or {}).get("items") or []:
+            for key in ("title", "effort", "impact", "evidence"):
+                if u.get(key) in (None, ""):
+                    problems.append(f"prose.ai.uses: {u.get('title')} needs {key}")
     moves = prose.get("moves")
     if moves is None:
         return
@@ -837,6 +871,8 @@ def build(run):
         "/*__MARKET__*/": script_safe(read("market.js")),
         "/*__LIBRARY__*/": script_safe(read("library.js")),
         "/*__IMPACT__*/": script_safe(read("impact.js")),
+        "/*__COMPARE__*/": script_safe(read("compare.js")),
+        "/*__AI__*/": script_safe(read("ai.js")),
         "/*__MOVES__*/": script_safe(read("moves.js")),
         "__TITLE__": title,
         "__BUNDLE__": embed_json(bundle),

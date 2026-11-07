@@ -22,6 +22,7 @@ FILES="SKILL.md
 example/treg-2026-10-28/README.md
 example/treg-2026-10-28/bundle-sample.json
 references/agent-brief-common.md
+references/geo-ai.md
 references/intake-questions.md
 references/moves.md
 references/performance-briefs.md
@@ -44,6 +45,8 @@ scripts/ledger.py
 scripts/merge_events.py
 scripts/render_test.py
 scripts/watch.py
+template/ai.js
+template/compare.js
 template/competition.js
 template/core.js
 template/d3.LICENSE.txt

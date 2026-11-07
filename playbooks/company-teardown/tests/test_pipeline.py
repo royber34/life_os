@@ -422,6 +422,32 @@ class MovesValidationTests(unittest.TestCase):
         bd.check_insights(prose, {}, None, out)
         return out
 
+    def test_ai_tab_needs_a_body_and_complete_findings(self):
+        p = self.good()
+        p["ai"] = {"body": "", "parts": [{"id": "offsite", "findings": [{"title": "t", "found": "f"}]}], "uses": {"items": [{"title": "u", "effort": 1}]}}
+        got = "\n".join(self.problems(p))
+        self.assertIn("prose.ai: body is required", got)
+        self.assertIn("a finding needs matters", got)
+        self.assertIn("needs impact", got)
+
+    def test_ai_tab_passes_when_complete(self):
+        p = self.good()
+        p["ai"] = {"body": "b", "parts": [{"id": "offsite", "findings": [{"title": "t", "found": "f", "matters": "m"}]}], "uses": {"items": [{"title": "u", "effort": 1, "impact": 2, "evidence": "thin"}]}}
+        self.assertEqual(self.problems(p), [])
+
+    def test_top_of_tab_rules(self):
+        p = self.good()
+        p["top"] = {"sowhat": {"headline": "h", "points": [{"value": "24 of 24", "label": "listings", "kind": "Measured", "viz": {"type": "pie"}}]}, "nope": {"headline": "h"}}
+        got = "\n".join(self.problems(p))
+        self.assertIn("nope is not a tab", got)
+        self.assertIn("unknown viz pie", got)
+        self.assertIn("a number needs a citation", got)
+
+    def test_method_points_need_no_citation(self):
+        p = self.good()
+        p["top"] = {"sowhat": {"headline": "h", "points": [{"value": "6.4%", "label": "estimated wrong", "kind": "Method"}]}}
+        self.assertEqual(self.problems(p), [])
+
     def test_good_moves_pass(self):
         self.assertEqual(self.problems(self.good()), [])
 
@@ -1003,6 +1029,22 @@ class CostTests(RunCase):
         self.assertEqual(run_script("cost_report", self.run_dir, "--subagent-logs", logs).returncode, 0)
         self.assertIn("| a.jsonl | 2 | 1 |", (self.run_dir / "cost-report.md").read_text(encoding="utf-8"))
         self.assertEqual(run_script("cost_report", self.run_dir, "--subagent-logs", self.run_dir / "nope").returncode, 2)
+
+
+class InstallerTests(unittest.TestCase):
+    """Both installers fetch a fixed file list, so a new skill file must be added to each, or fresh installs break."""
+
+    def test_installers_list_every_skill_file(self):
+        import re
+        root = SCRIPTS.parent
+        files = {p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()
+                 and "dashboard" not in p.parts and "__pycache__" not in p.parts}
+        files = {f for f in files if not f.startswith("example/") or f.endswith(("README.md", "bundle-sample.json"))}
+        for name in ("install.ps1", "install.sh"):
+            text = (root.parent / name).read_text(encoding="utf-8")
+            listed = set(re.findall(r"((?:SKILL\.md)|(?:(?:references|scripts|template|example)/[\w./-]+))", text))
+            self.assertEqual(files - listed, set(), f"{name} misses files")
+            self.assertEqual(listed - files, set(), f"{name} lists files that don't exist")
 
 
 if __name__ == "__main__":

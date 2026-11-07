@@ -20,13 +20,25 @@ Stay specific, so a move can't fit any other brand. Say what the area is, how su
 Go straight into what was found. Set out identified areas and why they matter, and let someone who knows the business draw the conclusion.
 
 - Never say who the page is for, describe the team, or assign owners.
-- Don't sequence the reader's work or give deadlines: no "first", "this week", "should", "must" or "needs to", and no imperative verbs. Dates appear only as facts that bear on an area.
-- Use "this points to", "worth examining", "one option is", "a test could compare" and "internal data would show", with variety. Stay specific: neutral must not mean vague.
-- Move titles are noun phrases naming the area.
+- Don't sequence the reader's work or give deadlines: no "first", "this week", "should", "must" or "needs to". Dates appear only as facts that matter.
+- State each idea clearly, as an idea. Clarity comes before caution: neutral must not mean vague.
 
 The first consumer run's owner called reader statements and "the first job for the company is" presumptuous. A reader inside the company won't take instructions from an outside page. The validator rejects second person and the worst of these phrases in `prose.moves`.
 
 Tailor the emphasis to the G0 decision, without saying so on the page.
+
+## Plain language
+
+A reader who knows the business, and hasn't seen the research, must get the point of each move on one read. A reader of an earlier version said: it "sounds smart", and "I get generally what the topic is roughly about but not what it's really trying to tell me".
+
+- The title is the takeaway, as a plain sentence: "The company may be owed a tariff refund". Avoid topic labels such as "IEEPA tariff refund route".
+- Give each move `stat`, one short number or fact with its citation, which shows on the row. Then `found` (what was found), `matters` (why it matters) and `idea` (the idea). Evidence detail goes in the folded fields, and `what` holds the fuller detail.
+- Never give a list of things to look up without saying what they'd show.
+- Explain terms: "the default seller on the listing", ahead of "buy box". Say stores, not doors, and new customers, not prospecting.
+- The idea can be stated directly as an idea or option, without assigning owners or deadlines. Neutral must not hide the point.
+- Write the assumptions beside any modelled number, in the same sentence, and name each rival or product the first time it appears.
+- Say what a figure compares with. "Leaves USD 32" and "earns USD 32 more than a dealer sale" are different claims.
+- Test it: give the titles, findings and ideas to two fresh readers with no context, one after the other. Ask each to score every move for clarity, quote the words that lost them, and name any figure without a basis or any reason that doesn't follow. Fix those, and check each rewording against its source.
 
 ## How to rank
 
@@ -44,7 +56,7 @@ New claims join the ledger through `ledger.py merge`. Anything a move rests on m
 
 ## 09-moves.md and prose.moves
 
-Write `09-moves.md` for reading and `prose.moves` for the page, from the same text. The page opens on the identified areas, and `references/insights.md` gives the tab's full order.
+Write `09-moves.md` for reading and `prose.moves` for the page, from the same text. The So what tab opens on the identified areas, and `references/insights.md` gives the tab's full order.
 
 1. **Identified areas.** A short statement of what the evidence shows and which areas stand out, plus the three with the most leverage.
 2. **Headline findings and how numbers could change the reading.** Three to six hard facts, each with a value, a line of meaning and a source kind, sharpest number included. Then rules: if internal numbers show this, it would suggest that, with illustrative thresholds. Optional dates that bear on the areas.
