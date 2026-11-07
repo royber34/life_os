@@ -29,7 +29,7 @@ The disk is the only run state. Every stage writes files, so a dead session lose
 | S1 Probe | `01-probe.md`, `probe.json`, `treg-plan.json`, `config.json`, 10 sample events | **G1:** modules, expected depth and cost |
 | S2 Research | `research/<ws>/*`, `02-coverage.md` | **G2:** coverage and gaps: backfill or go on |
 | S3 Verify | `verify/*`, including the measured error rate | Internal thresholds; the user sees the result |
-| S3b Deeper passes | `research/w9-*` and up, checked: moves pass, performance pass, campaign study, treg gap audit, GEO and AI use | Internal; report spend and gaps to the user |
+| S3b Deeper passes | `research/w9-*` and up, checked: moves pass, performance pass, campaign study, treg gap audit, GEO and AI use, rival history | Internal; report spend and gaps to the user |
 | S4 Synthesis | `03` to `08`, `09-moves.md`, optional `09-lens.md`, `verify/synthesis-review.md` | **G3:** the moves, the memo and the so what |
 | S5 Present | `dashboard/index.html`, `dashboard/screens/` with screenshots and `render-report.md` | **G4:** the user opens the page |
 | S6 Close | `raw-research-README.md`, `cost-report.md`, freshness note | None |
@@ -96,8 +96,9 @@ After S3, and before writing anything. Read `references/moves.md`, `references/i
 3. Check moves-pass rows with a random sample of 20 per workstream, and performance-pass rows in full, using fresh verifiers and the additions in `references/performance-briefs.md`. Fix or downgrade what fails, and log it in `verify/corrections.jsonl`.
 4. Run the treg gap audit in `references/treg.md`, and fill what it finds.
 5. Run the GEO and AI-use workstreams in `references/geo-ai.md`, if the brief includes the AI section, and check them in full.
-6. Update any finding the new evidence contradicts, and tell the user which.
-7. Report to the user in plain words what was reached and what wasn't.
+6. Run the rival-history workstream in `references/rival-history.md`, for up to 10 years of comparable data on the target and its main rivals, and check every cited claim with a fresh verifier. Skip it if the rivals have too little public history, and say so.
+7. Update any finding the new evidence contradicts, and tell the user which.
+8. Report to the user in plain words what was reached and what wasn't.
 
 A probe-only run skips this. If the brief caps the run at basic research, say what the page will lack.
 
@@ -153,6 +154,7 @@ End with what the user should do next, in order: the cheapest real-world test of
 | `references/verification.md` | S3, S4 |
 | `references/moves.md`, `references/insights.md`, `references/performance-briefs.md` | S3b, S4 |
 | `references/geo-ai.md` | S3b, when the brief includes the AI section |
+| `references/rival-history.md` | S3b |
 | `references/synthesis.md` | S4 |
 | `references/presentation.md`, `references/review-panel.md` | S5 |
 | `references/templates.md`, `references/style.md` | As needed |

@@ -58,6 +58,7 @@ You can also scope a run to one brand or market. These ranges are guides. The pu
 - **One smaller cold-start test,** on a software company from the written instructions alone: research on two workstreams, moves, insights, a campaign study and the page, with the checks self-marked. It found real problems, which are fixed. It didn't exercise background agents, independent verifiers or the review panel on that target.
 - **Automated:** 101 pipeline tests, plus browser checks on each built page.
 - **AI section:** the GEO audit and AI-use workstreams have run once, on the consumer brand. Their counts and claims were checked in full by fresh verifiers.
+- **Rivals over time:** the 10-year history was collected once, on the consumer brand, and checked by fresh verifiers. It's now a written workstream, which a fresh run hasn't followed yet.
 
 So expect a consumer run to work as described. Expect other company types to work, with more judgement along the way. A full run on a second company hasn't been done yet.
 

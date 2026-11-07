@@ -32,6 +32,7 @@
     "references/presentation.md",
     "references/review-panel.md",
     "references/probe.md",
+    "references/rival-history.md",
     "references/schemas.md",
     "references/style.md",
     "references/synthesis.md",

@@ -112,17 +112,7 @@ Moves and AI findings are one-line rows that open on click, so a reader scans th
 
 An indicator may carry `shade[{from,to,label}]`, for months that look unreliable: they stay visible and are left out of the scale. Check series before plotting: put terms in one Trends request or rescale on a shared anchor, cut months where a vendor's method changed, and leave out any brand whose domain covers far more than the product. Readers click chips to add or remove charts and brands. They can switch between actual values and change since the start.
 
-Community history, for consumer brands:
-
-- **Reddit:** count posts with the brand in the title inside the category's main forum (r/ebikes for e-bikes, say), month by month, using the free Arctic Shift archive (`arctic-shift.photon-reddit.com/api/posts/search`).
-  - Listing posts one month at a time works where its counting endpoint times out. Check the two methods against each other on months where both exist.
-  - Fetch the forum's total posts one month per request. Plot posts per 10,000, since forums grow a lot.
-  - Read about 25 random titles per brand by hand to check precision. Combine spellings, such as e-bike, e bike and ebike.
-  - Never use site-wide bare words: a brand named after a common word or a sport is mostly about that word.
-  - Compare three-year blocks, because one base year can flip the story.
-- **YouTube:** Google Trends with `gprop=youtube` gives 10 years of search interest. Show yearly means, since small terms round to whole numbers.
-
-No free source gave multi-year counts for news, TikTok, Instagram or forums outside Reddit (GDELT refused calls, and Trends' news property returned zeros), so say so on the page rather than leave a chart out silently.
+`references/rival-history.md` says how to collect and check the data.
 
 ## AI tab
 
