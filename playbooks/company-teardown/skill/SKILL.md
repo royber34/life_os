@@ -40,6 +40,23 @@ A gate passes on the user's own words. Record them in `run.json` and `RUN.md` wi
 - **Probe only:** stop at G1. Cheap, and shows what a full run would find.
 - **Full:** S0 to S6.
 - **Refresh:** reuse the earlier `probe.json` and `config.json`, set a new cutoff, research only what happened after the old cutoff, then run S3 to S6 on the additions and on any claim the new rows contradict.
+- **Client:** a full run delivered to the company itself, with a one-pager and the full report, released without a person in between when every check passes. See the next section.
+
+## Client mode: unattended, checked by rubric
+
+Use it when the user asks for a client report, or names a company and asks for the report to be delivered. Read `references/client-mode.md` first. Set `config.report_mode` to `"client"`, copy the rubric the user keeps for this into the run as `rubric.json`, and set `config.reader` (who will read it, for example "the founder, a scientist") and `config.brand` (`name`, `footer`).
+
+The five gates become checks. Record each with `runstate.py gate G# --words "auto: <the check that passed>"`, and the trigger with `gate G0 --words "<who asked, and their words>"`. The person who triggered the run hears from you only when a run is held.
+
+| Gate | Passes when | Otherwise |
+|---|---|---|
+| G0 Brief | Defaults: the reader is the company itself, the scope is the brand and its main market, public sources only, the budget caps in `run.json` (set `model_usd_cap` too). Preflight passes | Hold |
+| G1 Probe | At least 4 modules are viable and the cost estimate is inside the caps; the domain names one company | Hold, offering a probe-only brief |
+| G2 Coverage | Every kept module has 25 or more rows after at most one automatic backfill; a thinner module is dropped and named in the checking details | Hold when fewer than 4 modules remain |
+| G3 Synthesis | `rubric_check.py` and the four judges (`references/judges.md`, collected by `judges.py`) pass every must rule, read by `gate.py` | Fix from the judges' quotes and check again, at most 2 rounds; then hold |
+| G4 Page | `build_dashboard.py build` and `onepager`, `render_test.py`, `finalize.py`, then `gate.py` returns pass | Hold |
+
+Before each fix round, save the current `dashboard/prose.json` to `verify/drafts/prose-<round>.json`, so the rubric can check that nothing was lost. A hold writes `HOLD.md`; tell the user what it says, in plain words, and stop. Delivery (publishing the page and sending the one-pager) happens outside this skill, after `gate.py` returns pass.
 
 ## Starting or resuming
 
@@ -51,7 +68,13 @@ Look for a `teardown-*` folder in the working directory.
 
 ## S0 Intake
 
-Ask the questions in `references/intake-questions.md` in one message, each with its default. Read any notes or documents the user hands over first, and skip what they answer. Write `00-brief.md` with the goal, the hypothesis, the answers, and the stop rule. Create `run.json` per `references/schemas.md` and `RUN.md` from `references/templates.md`. Check Python is available, and whether Playwright is; say what is missing and what it will cost the run. Stop for G0.
+Ask the questions in `references/intake-questions.md` in one message, each with its default. Read any notes or documents the user hands over first, and skip what they answer. Write `00-brief.md` with the goal, the hypothesis, the answers, and the stop rule. Create `run.json` per `references/schemas.md` and `RUN.md` from `references/templates.md`.
+
+**Put the run folder outside any synced folder** (Proton Drive, OneDrive, Dropbox, iCloud, Google Drive). Parallel agents writing into a synced folder created conflict copies and stale screenshots in the first consumer run. Use a local folder such as `~/in-site-runs/teardown-<slug>/`, and copy the finished run to the user's project folder at S6.
+
+Then run `python -I "<skill>/scripts/preflight.py" "<run>"` (add `--require-treg` when the brief depends on treg). It checks the folder, Python, Playwright with Chromium, and that the treg server answers. Say what failed and what it costs the run; if treg is down, the run falls back to free sources and must say so on the page. Stop for G0.
+
+**Run state is kept by code.** Record every change with `python -I "<skill>/scripts/runstate.py" "<run>" <action> ...`: `stage <S#>` at the start of each stage, `gate <G#> --words "<the user's words>"` when a gate passes, and `start <ws>` / `resume <ws>` / `done <ws>` / `failed <ws>` for every workstream, including w9 and up. Never edit `run.json` by hand. Each change is timestamped in `run-log.jsonl`.
 
 ## S1 Probe
 
@@ -76,6 +99,7 @@ Before each wave, record the data tool balance in `run.json`. After launching, r
 | `RESUME <ws>` | Resume with SendMessage, naming the item to continue after. If the agent is from another session, launch a fresh one |
 | `SHARED-OUTAGE` | Most likely the computer slept, and agents usually carry on when it wakes. Relaunch nothing. Tell the user once. Keep polling, and resume only what stays silent after a beat returns |
 | `RELAUNCH <ws>` | A fresh agent with the common brief, "resume after item N" |
+| `REGISTER <ws>` | A workstream folder exists that `run.json` does not list. Run `runstate.py "<run>" start <ws>` so it is watched and closed like the others |
 
 When a wave ends, run `python -I "<skill>/scripts/merge_events.py" "<run>"`, and fix or drop bad rows with the owning agent. Spot-read two section files against their sources yourself.
 
@@ -138,7 +162,9 @@ Read the screenshots yourself, every tab at both widths, and fix what looks wron
 
 ## S6 Close
 
-Run `python -I "<skill>/scripts/cost_report.py" "<run>"`. Write `raw-research-README.md` from `references/templates.md`, so a future agent can re-analyse the run without repeating the collection. Add the freshness note: the cutoff, what goes stale first, and how to refresh.
+Run `python -I "<skill>/scripts/cost_report.py" "<run>"`, adding `--transcripts "<main session .jsonl>" "<its subagents folder>" --since <G0 time>` when the run was not headless, so model use is in the report next to data spend (headless runs save each stage's `--output-format json` result in `usage/` instead). Write `raw-research-README.md` from `references/templates.md`, so a future agent can re-analyse the run without repeating the collection. Add the freshness note: the cutoff, what goes stale first, and how to refresh.
+
+Then run `python -I "<skill>/scripts/finalize.py" "<run>"`. It checks that every workstream folder is registered and finished, that there are no sync-conflict copies, that the label is allowed and no load-bearing row lacks a verdict, that the page carries the report's label and was built and render-tested after its inputs, and that the page holds no local home-directory path (assemble makes run-folder paths relative, so a leak means an unrebuilt page or a path from outside the run). On success it writes the README's verification section from `verify/report.json` and sets the stage to S6 done. A run is closed only when finalize passes; if anything is added after closing (a new section, a late workstream), rerun the affected steps and finalize again. Then copy the run folder to the user's project folder.
 
 End with what the user should do next, in order: the cheapest real-world test of the main conclusion, and who to speak to with what questions. Nothing contacts anyone.
 
@@ -158,4 +184,9 @@ End with what the user should do next, in order: the cheapest real-world test of
 | `references/synthesis.md` | S4 |
 | `references/presentation.md`, `references/review-panel.md` | S5 |
 | `references/templates.md`, `references/style.md` | As needed |
+| `references/client-mode.md`, `references/judges.md` | Client mode: at intake, and at G3 and G4 |
 | `example/treg-2026-10-28/` | To see a small worked example |
+
+## Changing this skill
+
+After any change to the scripts, the template or a reference that affects the page, run `python -I "<skill>/scripts/regress.py" "<fixture>"` on a frozen copy of a finished run (kept privately, outside this repo). It must pass before the change is used on a client run.

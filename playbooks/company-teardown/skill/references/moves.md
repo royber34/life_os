@@ -36,6 +36,7 @@ A reader who knows the business, and hasn't seen the research, must get the poin
 - Never give a list of things to look up without saying what they'd show.
 - Explain terms: "the default seller on the listing", ahead of "buy box". Say stores, not doors, and new customers, not prospecting.
 - The idea can be stated directly as an idea or option, without assigning owners or deadlines. Neutral must not hide the point.
+- In client mode, each move also carries `further`: one line starting "Where to look further:" that names the records or public places worth looking into, up to 30 words, with no second person, no "should" and no claim about the result.
 - Write the assumptions beside any modelled number, in the same sentence, and name each rival or product the first time it appears.
 - Say what a figure compares with. "Leaves USD 32" and "earns USD 32 more than a dealer sale" are different claims.
 - Test it: give the titles, findings and ideas to two fresh readers with no context, one after the other. Ask each to score every move for clarity, quote the words that lost them, and name any figure without a basis or any reason that doesn't follow. Fix those, and check each rewording against its source.
@@ -73,7 +74,9 @@ Write `09-moves.md` for reading and `prose.moves` for the page, from the same te
    Say what a test needs before it can be read, such as a minimum number of orders, and what happens if it can't be read in time. Every move has: `what`, `why` with citations, `impact` and `effort` (1 to 5, relative judgement), `confidence`, `check_first` (legal or data, if any), `test`, `watch` (the number to look at), `if_wrong`, 
 6. **Opportunities, what's working, and what isn't.** `prose.moves.opportunities`, `working` and `not_working`, each with `title`, `evidence`, `use` (labelled So what), `proof` and the `moves` it links to. The page shows them in that order after the moves.
 7. **One data request.** Everything only the company holds, in one list, with who holds it and what it decides.
+   In client mode (`references/client-mode.md`) this becomes the Overview's "Where to look further" rows instead: each names a data source or place and what it would help clarify, with no team names, no request for access and no claim about what it would show.
 8. **Limits.** What only internal data can settle, and which moves it would change, plus what was cut and why.
+   In client mode, word the limits without "only internal data can settle" or "internal data would show", which read as a sales funnel to the company itself.
 
 ## Bands on the evidence tabs
 

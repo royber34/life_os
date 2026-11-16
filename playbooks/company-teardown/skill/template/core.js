@@ -374,6 +374,7 @@ window.tt = (() => {
       if (ws.some(([, l]) => String(l).startsWith('TOO FEW TO RATE'))) more.append(mk('p', 'tt-note', 'TOO FEW TO RATE: under 20 rows were checked in that workstream, so it gets no rating of its own. One wrong row in a handful says little.'));
       c.append(more);
     }
+    if ((v.left_out || []).length) c.append(mk('p', 'tt-note', `Left out by the brief, so not covered here: ${v.left_out.join('; ')}.`));
     if (v.cutoff) c.append(mk('p', 'tt-note', `Evidence cutoff: ${v.cutoff}.`));
     el.append(c);
   });

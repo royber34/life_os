@@ -93,7 +93,7 @@ Ids use the form `w7-g<n>`, so they cannot collide with the event ids `w7-<n>`.
 
 ```json
 {"id":"w8-p1","name":"","short_name":"max 18 chars","org":"","group":"id from config.competition.groups",
- "hq":null,"founded":null,"ownership":"private_vc|public|nonprofit|academic|government|big_tech_unit|open_source_project|bootstrapped|family",
+ "hq":null,"founded":null,"ownership":"private_vc|public|nonprofit|academic|government|big_tech_unit|open_source_project|bootstrapped|family|unknown",
  "overall":"2 to 3 sentences: what it is and why it matters here",
  "business_model":"","pricing":"","size":"","revenue":"","traction":"","funding":"",
  "positioning":"","positioning_line":"max 12 words","icp":"","gtm":"","moat":"","weaknesses":"",

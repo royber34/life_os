@@ -284,7 +284,28 @@
   dash.draw('connections', (el) => {
     if (el.dataset.done) return;
     el.dataset.done = '1';
-    const c = ((B.prose || {}).overview || {}).connections;
+    const ov = (B.prose || {}).overview || {};
+    // Client mode: "Where to look further" suggestions, with what each would help clarify.
+    if (ov.further && !ov.connections) {
+      const f = ov.further;
+      const sec = mk('section', 'tt-card tt-further');
+      // The fold's title carries the heading, so the card itself opens on the rows.
+      if (f.intro) sec.append(mdInto('tt-note tt-prose', f.intro));
+      const list = mk('div', 'tt-further-list');
+      for (const r of f.rows || []) {
+        const row = mk('div', 'tt-further-row');
+        row.append(mk('span', 'tt-further-src', r.source), mdInto('tt-further-what tt-prose', r.clarifies));
+        list.append(row);
+      }
+      sec.append(list);
+      el.append(sec);
+      el.hidden = false;
+      const fold = el.closest('details');
+      const label = fold && fold.querySelector('summary b');
+      if (label) label.textContent = f.heading || 'Where to look further';
+      return;
+    }
+    const c = ov.connections;
     el.hidden = !c;
     if (!c) return;
     const sec = mk('section', 'tt-card');

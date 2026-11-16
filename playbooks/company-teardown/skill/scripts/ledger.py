@@ -424,7 +424,7 @@ def cmd_report(run, a):
     lb = [r for r in rows if r["load_bearing"]]
     lb_open = [r["id"] for r in lb if r["id"] in verdicts and verdicts[r["id"]]["status"] in WRONG and r["id"] not in corrections]
     lb_none = [r["id"] for r in lb if r["id"] not in verdicts]
-    per_ws = {}
+    per_ws, outside_open_all = {}, []
     for ws in sorted({r["ws"] for r in rows}):
         extra = [i for i in second_ids if i in verdicts and verdicts[i]["status"] != "unreachable"]
         ids = [i for i in judged + extra if ledger[i]["ws"] == ws]
@@ -432,12 +432,23 @@ def cmd_report(run, a):
         # One wrong row in a handful of checks says little, so a workstream needs MIN_WS_RATED checks to earn a rating.
         label = "NOT CHECKED" if not ids else TOO_FEW if len(ids) < MIN_WS_RATED else rate_label(bad / len(ids))
         ws_rows = [r["id"] for r in rows if r["ws"] == ws]
+        # Rows a verifier read outside the random sample (load-bearing checks, or passes run after the sample was
+        # drawn) are reported as checked, but stay out of the wrong rate, which only the random sample measures.
+        # An unreachable source is not a check.
+        in_rate = set(ids)
+        outside = [i for i in ws_rows if i not in in_rate and i in verdicts and verdicts[i]["status"] != "unreachable"]
+        outside_open = [i for i in outside if verdicts[i]["status"] in WRONG and i not in corrections]
         if not ids and ws_rows and all(i in verdicts for i in ws_rows):
             bad_all = sum(1 for i in ws_rows if verdicts[i]["status"] in WRONG and i not in corrections)
             label = f"CHECKED IN FULL, NO RANDOM SAMPLE ({len(ws_rows)} rows, {bad_all} open)"
+        elif not ids and outside:
+            label = f"CHECKED OUTSIDE THE RANDOM SAMPLE ({len(outside)} of {len(ws_rows)} rows, {len(outside_open)} open)"
+        elif label == TOO_FEW and outside:
+            label = f"{TOO_FEW}; {len(outside)} more rows checked outside the random sample, {len(outside_open)} open"
         if any(ledger[i]["ws"] == ws for i in lb_open + lb_none):
             label = NOT_RELIABLE
-        per_ws[ws] = {"label": label, "checked": len(ids), "wrong": bad}
+        per_ws[ws] = {"label": label, "checked": len(ids), "wrong": bad, "outside_checked": len(outside), "outside_open": len(outside_open)}
+        outside_open_all += outside_open
     unreachable = sum(1 for v in verdicts.values() if v["status"] == "unreachable")
     share = unreachable / len(verdicts) if verdicts else 0.0
     worst = max((w for w in per_ws if per_ws[w]["checked"]), key=lambda w: (per_ws[w]["wrong"] / per_ws[w]["checked"], per_ws[w]["wrong"], w), default=None)
@@ -449,6 +460,9 @@ def cmd_report(run, a):
         findings.append(f"Load-bearing rows that could not be checked, so they stay unconfirmed: {', '.join(lb_unreach)}.")
     if lb_none:
         findings.append(f"Load-bearing rows with no verdict yet, run `delta`: {', '.join(lb_none)}.")
+    other_open = [i for i in outside_open_all if i not in lb_open]
+    if other_open:
+        findings.append(f"Rows checked outside the random sample and still wrong or unsupported, with no correction: {', '.join(other_open)}.")
     if not judged:
         findings.append("No random-stratum row has a usable verdict, so no error rate exists.")
     if pending:
@@ -472,7 +486,7 @@ def cmd_report(run, a):
             findings.append(f"Wrong rate is between 3 and 6 percent: run a second sample on the worst workstream, {worst} (`sample --seed N --second-ws {worst}`).")
     if 0 < len(judged) < 30 and label == ACCURATE:
         label = SECOND  # a clean result on a very small sample proves little, so it can't earn the top label
-    thin = [w for w, v in per_ws.items() if v["label"] == TOO_FEW]
+    thin = [w for w, v in per_ws.items() if v["label"].startswith(TOO_FEW)]
     if thin:
         findings.append(f"Too few random checks to rate on their own (under {MIN_WS_RATED}): {', '.join(thin)}.")
     # Rows added after the random draw, such as the moves pass, get their own rate and never mix into the main one.
@@ -508,7 +522,7 @@ def cmd_report(run, a):
           f"The interval is an exact Clopper-Pearson range: the data fit a true wrong rate anywhere from {pc(low)} to {pc(high)}, "
           "and 95 of 100 intervals built this way contain the true rate. It treats the stratified draw as a simple random sample.",
           "", "## Findings", ""] + ([f"- {f}" for f in findings] or ["None."]) + ["", "## Per workstream", "",
-          "| Workstream | Label | Checked | Wrong | Rate |", "|---|---|---|---|---|"]
+          "| Workstream | Label | Random sample checked | Random sample wrong | Rate |", "|---|---|---|---|---|"]
     md += [f"| {w} | {v['label']} | {v['checked']} | {v['wrong']} | {pc(v['wrong'] / v['checked']) if v['checked'] else 'n/a'} |" for w, v in per_ws.items()]
     (run / "verify" / "report.md").write_text("\n".join(md) + "\n", encoding="utf-8", newline="\n")
     print(f"verify/report.md: {label}; wrong rate {pc(rate) if judged else 'n/a'} ({pc(low)} to {pc(high)}), {len(findings)} findings")

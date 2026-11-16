@@ -3,11 +3,13 @@
 
     python render_test.py <index.html> <outdir>
 
-Writes <outdir>/render-report.md and screenshots, and exits non-zero on any failure.
+Writes <outdir>/render-report.md and screenshots, replacing the whole folder only once the
+render is complete, and exits non-zero on any failure.
 Needs Playwright with Chromium installed.
 """
 import json
 import math
+import shutil
 import sys
 from pathlib import Path
 
@@ -103,7 +105,7 @@ def tab_checks(page, rep, bundle):
         rep.exact("Moves: rows", count(page, ".tt-mrow.tt-move"), len(moves["items"]))
         rep.exact("Moves: headline findings", count(page, ".tt-fact"), len(moves["headlines"]))
         rep.exact("Moves: decision rules", count(page, '[data-draw="movesrules"] .tt-rules tbody tr'), len(moves["rules"]))
-        rep.exact("Moves: data request rows", count(page, '[data-draw="movesrequest"] tbody tr'), len(moves["data_request"]))
+        rep.exact("Moves: data request rows", count(page, '[data-draw="movesrequest"] tbody tr'), len(moves.get("data_request") or []))
         rep.exact("Moves: matrix dots", count(page, ".tt-mdot"), len(moves["items"]))
         top = [m for m in moves["items"] if m.get("priority")]
         rep.exact("Moves: opens on the main areas", page.locator(".tt-mrow.tt-move:visible").count(), len(top))
@@ -390,6 +392,20 @@ def interaction_checks(page, rep, bundle):
             page.mouse.click(1, 1)
 
 
+TOP_BOTTOM_JS = """(tab) => {
+  const top = document.querySelector(`[data-band="${tab}"].tt-top`);
+  if (!top || top.hidden || !top.offsetParent) return null;
+  const tiles = top.querySelector('.tt-top-tiles') || top;
+  return tiles.getBoundingClientRect().bottom + window.scrollY;
+}"""
+
+
+def pdf_pages(data):
+    """Page count of a PDF from its page objects (Chromium writes one /Type /Page per page)."""
+    import re
+    return len(re.findall(rb"/Type\s*/Page(?![s\w])", data))
+
+
 def run_all_tabs(page, fn):
     tabs = page.eval_on_selector_all(".tt-tab", "els => els.map((e) => e.dataset.tab)")
     for t in tabs:
@@ -402,8 +418,13 @@ def main(argv):
         print(__doc__)
         return 2
     html = Path(argv[1]).resolve()
-    outdir = Path(argv[2]).resolve()
-    outdir.mkdir(parents=True, exist_ok=True)
+    final = Path(argv[2]).resolve()
+    # Render into a fresh sibling folder and swap it in at the end, so screenshots from an
+    # earlier render never survive next to new ones, and a crash leaves the old set intact.
+    outdir = final.parent / f".{final.name}.rendering"
+    if outdir.exists():
+        shutil.rmtree(outdir)
+    outdir.mkdir(parents=True)
     rep = Report()
     errors, failed, external = [], [], []
     with sync_playwright() as pw:
@@ -429,6 +450,31 @@ def main(argv):
         page.click('.tt-tab[data-tab="overview"]')
         settle(page)
         run_all_tabs(page, lambda t: shot(page, outdir, f"{t}-{WIDE}"))
+
+        # Where each tab's top (headline and key cards) ends on a first desktop screen, for the rubric.
+        layout = {}
+        def measure(t):
+            page.evaluate("() => window.scrollTo(0, 0)")
+            bottom = page.evaluate(TOP_BOTTOM_JS, t)
+            if bottom is not None:
+                layout[t] = {"top_bottom_px": round(bottom), "viewport": [WIDE, 900]}
+        run_all_tabs(page, measure)
+        (outdir / "layout.json").write_text(json.dumps(layout, indent=1) + "\n", encoding="utf-8")
+
+        onepager = html.parent / "onepager.html"
+        if onepager.exists():
+            op = ctx.new_page()
+            op.goto(onepager.as_uri())
+            settle(op, 200)
+            op.screenshot(path=str(outdir / "onepager.png"), full_page=True)
+            a4 = op.pdf(format="A4", print_background=True, prefer_css_page_size=True)
+            letter = op.pdf(format="Letter", print_background=True)
+            (html.parent / "onepager.pdf").write_bytes(a4)
+            rep.exact("One-pager fits one A4 page", pdf_pages(a4), 1)
+            rep.exact("One-pager fits one Letter page", pdf_pages(letter), 1)
+            bad = op.eval_on_selector_all("a[href]", "els => els.map((a) => a.getAttribute('href')).filter((h) => !/^(https?:|index\\.html|#)/.test(h))")
+            rep.check("One-pager links are sources, trails or the report", not bad, bad[:5] or "all links resolve to a source, a trail or the report")
+            op.close()
 
         # Phone: a fresh load, so first-show sizing is real at this width too.
         phone = browser.new_context(viewport={"width": PHONE, "height": 844}, color_scheme="light", has_touch=True, is_mobile=True)
@@ -471,8 +517,15 @@ def main(argv):
     lines += [f"Result: **{'FAIL' if rep.failed else 'PASS'}**, {len(rep.rows) - len(rep.failed)} of {len(rep.rows)} checks passed.", "", "| Check | Result | Detail |", "|---|---|---|"]
     for name, ok, detail in rep.rows:
         lines.append(f"| {name} | {'pass' if ok else 'FAIL'} | {detail.replace('|', '/')[:160]} |")
-    report = outdir / "render-report.md"
-    report.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (outdir / "render-report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    old = final.parent / f".{final.name}.old"
+    if old.exists():
+        shutil.rmtree(old)
+    if final.exists():
+        final.rename(old)
+    outdir.rename(final)
+    shutil.rmtree(old, ignore_errors=True)
+    report = final / "render-report.md"
     print(f"{len(rep.rows) - len(rep.failed)} of {len(rep.rows)} checks passed.")
     for name, _, detail in rep.failed:
         print(f"FAIL {name}: {detail[:200]}")

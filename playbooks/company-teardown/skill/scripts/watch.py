@@ -59,6 +59,21 @@ def read_heartbeats(run, warnings):
     return beats
 
 
+def beat_for(beats, ws):
+    """Heartbeats may name the full folder (w9-marketplace) or only its prefix (w9)."""
+    return beats.get(ws) or beats.get(ws.split("-", 1)[0])
+
+
+def untracked(run, workstreams):
+    """Workstream folders under research/ that run.json does not list (w9 and up are easy to forget)."""
+    research = run / "research"
+    if not research.is_dir():
+        return []
+    known = set(workstreams)
+    return sorted(p.name for p in research.iterdir()
+                  if p.is_dir() and p.name[:1] == "w" and p.name.split("-", 1)[0][1:].isdigit() and p.name not in known)
+
+
 def read_progress(path, warnings):
     """Return (the n of the last valid progress.jsonl row or None, the newest readable ts or None)."""
     n, newest = None, None
@@ -89,7 +104,8 @@ def assess(run, args, now=None):
         if info.get("started") and started is None:
             warnings.append(f"{ws} has an unreadable started time: {info['started']!r}")
         saved, progress_ts = read_progress(path, warnings) if has_progress else (None, None)
-        marks = [t for t in (progress_ts, beats[ws][0] if ws in beats else None) if t is not None]
+        beat = beat_for(beats, ws)
+        marks = [t for t in (progress_ts, beat[0] if beat else None) if t is not None]
         if not marks and has_progress:
             marks.append(path.stat().st_mtime)
         base = max(marks) if marks else started
@@ -97,10 +113,12 @@ def assess(run, args, now=None):
         if base is None:
             warnings.append(f"{ws} is running with no started time and no activity; its age is unknown")
         missing = not has_progress and started is not None and (now - started) / 60 >= args.no_progress_min
-        states.append({"ws": ws, "age": age, "saved": saved, "items": saved if saved is not None else beats.get(ws, (0, 0))[1],
+        states.append({"ws": ws, "age": age, "saved": saved, "items": saved if saved is not None else (beat or (0, 0))[1],
                        "stale": age is not None and age > args.stale_min, "dead": age is not None and age > args.dead_min,
                        "resumes": int(info.get("resumes") or 0), "missing": missing})
     recs, lines = [], [f"WARN {w}" for w in warnings]
+    for ws in untracked(run, workstreams):
+        recs.append(f"REGISTER {ws}: research/{ws}/ exists but run.json does not list it; run runstate.py start")
     stale = [s for s in states if s["stale"]]
     # One running workstream gives no second signal to tell an outage from a hang, so per-workstream rules apply.
     outage = len(states) >= 2 and len(stale) == len(states)
@@ -121,10 +139,11 @@ def assess(run, args, now=None):
             recs += notes
         age = "unknown" if s["age"] is None else f"{s['age']:.1f}m"
         lines.append(f"{s['ws']}  age {age}  items {s['items']}  resumes {s['resumes']}  {'; '.join(notes) or 'OK'}")
-    finished = bool(workstreams) and all(i.get("status") in ("done", "failed") for i in workstreams.values())
+    finished = (bool(workstreams) and all(i.get("status") in ("done", "failed") for i in workstreams.values())
+                and not any(r.startswith("REGISTER ") for r in recs))
     if finished:
         recs_text = "ALL-FINISHED"
-    elif not states:
+    elif not states and not recs:
         recs_text = "nothing running"
     else:
         recs_text = "; ".join(recs) or "all fresh"

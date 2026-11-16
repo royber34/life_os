@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
-"""Sum paid calls, reconcile against balance checks, flag cap breaches, write cost-report.md.
+"""Sum paid calls and model use, reconcile against balance checks, flag cap breaches, write cost-report.md.
 
 Usage: python -I cost_report.py <run-dir> [--subagent-logs <folder>]
+                                [--transcripts <file-or-folder> ...] [--since ISO] [--until ISO]
+Model use comes from <run-dir>/usage/*.json (the result of `claude -p --output-format json`, one file per stage),
+and from Claude Code transcripts given with --transcripts (main .jsonl and the subagents folder), counted once per
+message id and priced at the list prices in PRICES. A budgets.model_usd_cap in run.json is checked.
 Exit 0 on success, 1 on malformed call rows, 2 on an unusable run folder.
 """
 import argparse, json, sys
@@ -9,6 +13,76 @@ from collections import defaultdict
 from pathlib import Path
 
 CALL_KEYS = "ts ws endpoint provider_served price purpose status hit claim_ids".split()
+
+# USD per million tokens: input, output, cache read. Cache writes cost 1.25x input (5-minute) or 2x input (1-hour).
+# Anthropic list prices as cached on 2026-11-03; update this table when prices change.
+PRICES = {
+    "claude-fable-5-2": (8.0, 40.0, 0.20), "claude-fable-5-1": (10.0, 50.0, 0.25), "claude-fable-5": (10.0, 50.0, 0.25),
+    "claude-opus-5-5": (4.0, 20.0, 0.20), "claude-opus-5": (5.0, 25.0, 0.50),
+    "claude-sonnet-5-5": (2.0, 10.0, 0.10), "claude-sonnet-5": (2.0, 10.0, 0.20),
+    "claude-haiku-5-5": (0.10, 0.50, 0.01),
+}
+
+
+def usage_cost(model, u):
+    """Return the list-price USD of one usage block, or None when the model is not in PRICES."""
+    p = PRICES.get(model)
+    if p is None:
+        return None
+    pin, pout, pread = p
+    cc = u.get("cache_creation") or {}
+    w1h, w5m = cc.get("ephemeral_1h_input_tokens"), cc.get("ephemeral_5m_input_tokens")
+    if w1h is None and w5m is None:  # split not recorded: price as 1-hour, the upper bound
+        w1h, w5m = u.get("cache_creation_input_tokens") or 0, 0
+    return ((u.get("input_tokens") or 0) * pin + (u.get("output_tokens") or 0) * pout
+            + (u.get("cache_read_input_tokens") or 0) * pread + (w5m or 0) * pin * 1.25 + (w1h or 0) * pin * 2.0) / 1e6
+
+
+def transcript_usage(paths, since=None, until=None):
+    """Sum usage from Claude Code transcripts. Streamed chunks repeat a message's usage, so each id counts once per file."""
+    by_model = defaultdict(lambda: {"usd": 0.0, "output_tokens": 0, "messages": 0, "unpriced": False})
+    files = []
+    for p in paths:
+        files += sorted(p.rglob("*.jsonl")) if p.is_dir() else [p]
+    for fp in files:
+        seen = set()
+        for raw in fp.read_bytes().split(b"\n"):
+            if not raw.strip():
+                continue
+            try:
+                d = json.loads(raw.decode("utf-8-sig"))
+            except ValueError:
+                continue
+            if not isinstance(d, dict) or d.get("type") != "assistant":
+                continue
+            ts = str(d.get("timestamp") or "")
+            if (since and ts < since) or (until and ts >= until):
+                continue
+            m = d.get("message") or {}
+            mid, model, u = m.get("id"), m.get("model", "?"), m.get("usage") or {}
+            if not u or mid in seen or model.startswith("<"):
+                continue
+            seen.add(mid)
+            row = by_model[model]
+            cost = usage_cost(model, u)
+            row["usd"] += cost or 0.0
+            row["unpriced"] |= cost is None
+            row["output_tokens"] += u.get("output_tokens") or 0
+            row["messages"] += 1
+    return dict(by_model), len(files)
+
+
+def headless_usage(run):
+    """Sum total_cost_usd from saved `claude -p --output-format json` results in <run>/usage/."""
+    rows = []
+    for fp in sorted((run / "usage").glob("*.json")) if (run / "usage").is_dir() else []:
+        try:
+            d = json.loads(fp.read_text(encoding="utf-8-sig"))
+        except ValueError:
+            rows.append((fp.name, None))
+            continue
+        rows.append((fp.name, d.get("total_cost_usd") if isinstance(d, dict) else None))
+    return rows
 
 
 def die(msg, code=2):
@@ -102,6 +176,9 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("run_dir", type=Path)
     ap.add_argument("--subagent-logs", type=Path)
+    ap.add_argument("--transcripts", type=Path, nargs="+", help="Claude Code transcript .jsonl files or folders")
+    ap.add_argument("--since", help="ISO time; count transcript messages at or after it")
+    ap.add_argument("--until", help="ISO time; count transcript messages before it")
     args = ap.parse_args()
     run = args.run_dir
     if not (run / "research").is_dir():
@@ -143,6 +220,40 @@ def main():
         out.append("- Total cap: not set in run.json budgets, so it was not checked.")
     else:
         out.append(f"- Total against the cap of {cap} USD: {total:.4f} USD. Passed the cap: {'YES' if total > cap else 'no'}.")
+    out.append("")
+    out += ["## Model use", ""]
+    model_total, model_known = 0.0, False
+    headless = headless_usage(run)
+    if headless:
+        model_known = True
+        out += ["From saved headless results in usage/:", "", "| File | USD |", "|---|---|"]
+        for name, usd in headless:
+            out.append(f"| {name} | {'unreadable' if usd is None else f'{usd:.2f}'} |")
+            model_total += usd or 0.0
+        out.append("")
+    if args.transcripts:
+        missing = [str(p) for p in args.transcripts if not p.exists()]
+        if missing:
+            die(f"--transcripts: not found: {', '.join(missing)}")
+        by_model, nfiles = transcript_usage(args.transcripts, args.since, args.until)
+        model_known = True
+        window = f", from {args.since or 'start'} to {args.until or 'end'}"
+        out += [f"From {nfiles} transcript file(s){window}, each message counted once, at list prices:", "",
+                "| Model | Messages | Output tokens | USD |", "|---|---|---|---|"]
+        for model, r in sorted(by_model.items(), key=lambda kv: -kv[1]["usd"]):
+            usd = "not priced (add it to PRICES)" if r["unpriced"] and not r["usd"] else f"{r['usd']:.2f}"
+            out.append(f"| {model} | {r['messages']} | {r['output_tokens']:,} | {usd} |")
+            model_total += r["usd"]
+        out.append("")
+        if headless:
+            out.append("- Note: headless results and transcripts were both given; if they cover the same work, the total double-counts it.")
+    if model_known:
+        out.append(f"- Model use total: {model_total:.2f} USD")
+    else:
+        out.append("- Model use: not measured. Save each stage's `claude -p --output-format json` result to usage/, or pass --transcripts.")
+    model_cap = budgets.get("model_usd_cap")
+    if model_cap is not None and model_known:
+        out.append(f"- Against the model cap of {model_cap} USD: {model_total:.2f} USD. Passed the cap: {'YES' if model_total > model_cap else 'no'}.")
     out.append("")
     if rows:
         out += table(rows, "ws", "workstream") + table(rows, "endpoint", "endpoint") + table(rows, "provider_served", "provider")

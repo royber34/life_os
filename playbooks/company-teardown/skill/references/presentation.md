@@ -71,7 +71,7 @@ Each move should carry `found`, `matters` and `idea`. The card shows these three
 - `prose.gtm.insights`: `{heading, summary, stats[], brief{heading,note,rows}, lenses[{id,label,intro,working[],not[],open[]}], tables[{id,title,note,columns,rows}]}`. Items are `{title, evidence, use, measure, proof}`. Opens the Go-to-market tab.
 - `prose.gtm.impact_intro` and `config.impact.views[{id,label,metric,series,controls}]`, where `metric` is a study metric id, `series` is its `series_id`, and `controls` are the generated names in `series.json`, in the form `control_<name>_<pull id>` with spaces as underscores. Any `research/*/campaign_impact.jsonl` with its `series.json` is read into `bundle.impact`, and only the listed series go into the page.
 - `scripts/campaign_impact.py` produces the study files. See `references/performance-briefs.md`.
-- `prose.overview.connections`: `{heading, intro, rows[{tool, adds, settles, moves}]}`.
+- `prose.overview.connections`: `{heading, intro, rows[{tool, adds, settles, moves}]}`. In client mode use `prose.overview.further` instead (`references/client-mode.md`), drawn in the same fold under the title "Where to look further".
 - `prose.moves.opportunities`, `working`, `not_working`: items are `{title, evidence, use, proof, moves[]}`.
 
 A section with `hidden` in its markup never draws, since the runtime skips hidden parents. Unhide it at load time, as `moves.js` and `impact.js` do.
@@ -87,7 +87,9 @@ A section with `hidden` in its markup never draws, since the runtime skips hidde
   - `viz`: optional, one of `dots{n,d}`, `pips{n,names}`, `bars{rows[{label,value,text,focus}],max}`, `range{lo,hi,min,max,min_label,max_label,assumed}` or `share{part,whole}`.
   - `label`: says exactly what was counted, in words a stranger follows, with citations. It shows above the picture.
   - `means`: one or two sentences on what the number means for the business, and how far it can be trusted. Every number the reader sees needs this.
+    In client mode, `means` says what it means and leaves trust caveats to the checking details, and each point also carries `reasoning` for its evidence trail (`references/client-mode.md`).
   - `kind`: such as Measured, Estimate, Public record, or Method. Every number needs a citation, unless the kind is Method.
+    In client mode, tab tops carry only Measured, Public record and One day's check (plus Inferred on the AI tab's inside-the-company cards). Estimates and the method sit in the checking details, so the reader meets findings first. The key-cards format stays the same.
   - `goto` and `goto_label`: `move:<id>`, `part:<id>`, `tab:<tab>`, `doc:<slug>` or `id:<tab>/<element id>`.
 - `doors[]`: chips to the next layer, `{label,goto}`. Leave these out if the tab already has filter chips.
 

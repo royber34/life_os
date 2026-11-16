@@ -23,6 +23,8 @@ Have fresh verifiers check every row in full, and let them read the tidy and raw
 - `measure`: for opportunities, what a test could watch, and what result would argue against it.
 - `proof`: how strong it is.
 
+An item that says the target lacks something (the usual "not working" and "opportunity" shape) needs a cited absence row from a full-text search of the raw copy, as in `references/synthesis.md`; a keyword rule's empty bucket is not one.
+
 Add a possible campaign brief, a dated 12-month calendar, and whichever field tables fit: for consumer brands a price ladder by channel, objections, sell-in outline, territory table and target doors; for software plans and packaging, free-to-paid signals, self-host against cloud, objections, and target integrations or segments.
 
 ## Fitting this to the target

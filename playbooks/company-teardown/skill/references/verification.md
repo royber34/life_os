@@ -67,7 +67,7 @@ Run `split`, fresh verifiers and `report` as usual. A row re-checked later has s
 - **Relative dates:** "3 years ago" stays as stated, with the date read. Never convert it into an exact date.
 - **Paid responses:** a claim from a paid call needs its saved fields and call id in `raw/`, and a verifier can re-run the call.
 - **Estimates and vendor models:** check that the source gives the number and that the row says it's an estimate. The verifier isn't judging whether the estimate is true.
-- **"None found" and process claims:** these describe a search. Mark `type: process`, state exactly what was searched, and leave them out of the random sample.
+- **"None found" and process claims:** these describe a search. Mark `type: process`, state exactly what was searched, and leave them out of the random sample. When one is load-bearing, or says the target's own ads, pages or offers lack something, a verifier re-runs the stated search on the saved raw copy and on the live source, and also tries the obvious variants the original search might have missed; a hit makes the claim wrong.
 
 ## Corrections
 

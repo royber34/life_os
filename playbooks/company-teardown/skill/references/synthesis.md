@@ -65,5 +65,6 @@ Apply the findings to the user's question. Keep it separate from the company res
 
 - Re-read the original ask in `00-brief.md`. Did this answer it?
 - Re-check all math.
+- Any sentence saying the target lacks something ("no ad speaks to", "doesn't offer", "has no") rests on a cited absence row whose search covered that exact thing; an empty bucket in a classifier, or a row about something narrower, doesn't count. Without one, reword it to what was counted.
 - Run `references/style.md` over it.
 - Remove anything that doesn't help the reader decide.

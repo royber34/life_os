@@ -28,6 +28,10 @@ Claude stops for your yes at each gate.
 
 There's also a probe-only mode, which tells you cheaply what a full run would find, and a refresh mode for updating an earlier run.
 
+### Client mode
+
+For a report delivered to the company itself, with no person reviewing it in between. Every run produces a one-page teaser (PDF) and the full page, built from one list of findings so the two never disagree. Each key finding opens an evidence trail: the facts it rests on, the passage a checker found in each source, the check status, and the reasoning, with inference labelled. The five gates become checks: a rubric of yes/no rules you keep privately, checked by script (`rubric_check.py`) and by four judge agents (`references/judges.md`); a failing rule gets up to two fix rounds, and then the run is held with a plain-English `HOLD.md`. The cold reader and the sceptical owner run three times and the majority decides each item, and a fix round judges only the items it changed, carrying the rest forward, since single runs flipped on unchanged text. `gate.py` releases a run only when every must rule, the closing check, the render test and the spend caps pass. See `skill/references/client-mode.md`. Client mode is built and tested on synthetic data and on a client-mode copy of the consumer run, and its judges were calibrated on labelled before and after versions of that run. One fresh client run has been done as a shadow run, delivered to the operator first; the gate held it after its fix rounds, which led to the repeated judging and carried verdicts above.
+
 ## What makes it different from "research this company"
 
 - **It checks what's knowable first.** A company with a public repo gives you pivots with stated reasons. A private consumer brand gives you ads and reviews, and thin economics. The probe tells you which before you spend.
@@ -56,7 +60,8 @@ You can also scope a run to one brand or market. These ranges are guides. The pu
 
 - **One full run,** on a consumer brand, including the deeper passes and the review panel. Many of its fixes were made along the way, and are now in the playbook.
 - **One smaller cold-start test,** on a software company from the written instructions alone: research on two workstreams, moves, insights, a campaign study and the page, with the checks self-marked. It found real problems, which are fixed. It didn't exercise background agents, independent verifiers or the review panel on that target.
-- **Automated:** 101 pipeline tests, plus browser checks on each built page.
+- **One client shadow run,** on a consumer brand in client mode. Its fixes are in the playbook.
+- **Automated:** 230 tests across the pipeline, the rubric checks and the judge and release layer, plus browser checks on each built page. `regress.py` replays the deterministic end of a finished run (report, page build, render test) from a frozen copy and compares it byte for byte with the original; on the consumer run it matches exactly.
 - **AI section:** the GEO audit and AI-use workstreams have run once, on the consumer brand. Their counts and claims were checked in full by fresh verifiers.
 - **Rivals over time:** the 10-year history was collected once, on the consumer brand, and checked by fresh verifiers. It's now a written workstream, which a fresh run hasn't followed yet.
 
@@ -66,7 +71,8 @@ So expect a consumer run to work as described. Expect other company types to wor
 
 From one full consumer run, so treat these as rough:
 - **Paid data:** USD 1.53 for the main research, against a default cap of USD 5, and about USD 5 in all once the deeper passes, the AI section and the rivals history were added.
-- **Work:** many hours of agent time, with model usage the real cost, and it is large. That run's total went well past the 3 to 4 active hours first planned. Use probe-only first if you're unsure.
+- **Model use, at API list prices:** about USD 79 from intake to the first page, then about USD 163 more across the rounds of feedback, added sections and fixes that followed. `cost_report.py` now measures this for every run, from headless results or session transcripts, and checks a `model_usd_cap`.
+- **Work:** many hours of agent time. That run's total went well past the 3 to 4 active hours first planned. Use probe-only first if you're unsure.
 - **You:** a review at each of the five gates.
 
 ---
@@ -87,7 +93,7 @@ irm https://raw.githubusercontent.com/royber34/life_os/main/playbooks/company-te
 
 Start a new session, then ask: *"do a company teardown of [company]"*.
 
-**Needs:** Python 3. For the page's render test, Playwright too (`pip install playwright`, then `playwright install chromium`). Without it the page still builds, and you check the tabs yourself.
+**Needs:** Python 3.10 or later. Run folders belong outside synced folders (Proton Drive, OneDrive, Dropbox), which create conflict copies when agents write in parallel; `preflight.py` checks this. For the page's render test, Playwright too (`pip install playwright`, then `playwright install chromium`). Without it the page still builds, and you check the tabs yourself.
 
 **Better with:** [treg](https://treg.to) connected as an MCP, for X, YouTube captions, SEO, ad libraries, reviews, enrichment and marketplaces at a small per-call price. Without it, the run uses free sources and web search, and social, SEO and ads get thinner.
 
@@ -101,11 +107,12 @@ One HTML file with everything inlined, so it works offline and you can email it.
 .
 ├── README.md
 ├── install.sh, install.ps1
-├── tests/                      Tests for the pipeline scripts (not installed)
+├── tests/                      Tests for the scripts (not installed)
 └── skill/
     ├── SKILL.md                Stages, gates, rules, resume
     ├── references/             One guide per stage, plus schemas and style
-    ├── scripts/                watch, merge_events, ledger, campaign_impact, build_dashboard, render_test, cost_report
+    ├── scripts/                preflight, runstate, watch, merge_events, ledger, campaign_impact, build_dashboard,
+    │                           render_test, cost_report, finalize, regress, rubric_check, judges, gate
     ├── template/               The page: HTML, CSS, JS, pinned d3
     └── example/                A trimmed public-facts sample
 ```

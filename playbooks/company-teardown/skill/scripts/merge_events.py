@@ -30,7 +30,7 @@ ENUMS = {
                    "github partner referral pricing_hook event other".split()),
     "format": set("video thread post reply page listing repo ad email talk podcast article launch program other".split()),
     "ownership": set("private_vc public nonprofit academic government big_tech_unit open_source_project "
-                     "bootstrapped family".split()),
+                     "bootstrapped family unknown".split()),
     "threat_level": {"high", "medium", "low"}, "partner_level": {"high", "medium", "low", "none"},
 }
 CONTRACT_WS = set("w1-timeline w2-economics w3-traction w4-legal w5-product w6-team w7-gtm w8-competitors".split())

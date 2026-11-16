@@ -22,8 +22,10 @@ FILES="SKILL.md
 example/treg-2026-10-28/README.md
 example/treg-2026-10-28/bundle-sample.json
 references/agent-brief-common.md
+references/client-mode.md
 references/geo-ai.md
 references/intake-questions.md
+references/judges.md
 references/moves.md
 references/performance-briefs.md
 references/insights.md
@@ -41,10 +43,17 @@ references/verification.md
 references/workstreams.md
 scripts/build_dashboard.py
 scripts/cost_report.py
+scripts/finalize.py
+scripts/gate.py
+scripts/judges.py
 scripts/campaign_impact.py
 scripts/ledger.py
 scripts/merge_events.py
+scripts/preflight.py
+scripts/regress.py
 scripts/render_test.py
+scripts/rubric_check.py
+scripts/runstate.py
 scripts/watch.py
 template/ai.js
 template/compare.js
@@ -58,9 +67,11 @@ template/index.html
 template/library.js
 template/market.js
 template/moves.js
+template/onepager.html
 template/impact.js
 template/shim.js
-template/timeline.js"
+template/timeline.js
+template/trail.js"
 
 echo "Installing the company-teardown skill..."
 

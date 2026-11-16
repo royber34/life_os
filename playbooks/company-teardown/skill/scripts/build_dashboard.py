@@ -4,6 +4,7 @@
     python -I build_dashboard.py assemble <run-dir>
     python -I build_dashboard.py validate <run-dir>
     python -I build_dashboard.py build <run-dir>
+    python -I build_dashboard.py onepager <run-dir> [--report-url URL]   (client mode: writes dashboard/onepager.html)
 
 Standard library only. The field contract is in references/presentation.md.
 """
@@ -129,6 +130,53 @@ def metric_agg(metrics, name, agg):
 
 def stat_entry(value, fmt, date=None):
     return {"value": value, "text": fmt_value(value, fmt), "fmt": fmt, "date": date, "missing": value is None}
+
+
+SEP = r"(?:\\{1,2}|/)"  # a path separator as written: /, \ or JSON-escaped \\
+
+
+def folder_re(folder):
+    """Match an absolute folder exactly, written with any separator, ending at a separator or the end of the path.
+    finalize.py keeps the same function; a test pins the two together."""
+    p = Path(folder).resolve()
+    parts = [re.escape(x) for x in p.as_posix().split("/") if x]
+    if not parts:
+        return None
+    body = SEP.join(parts)
+    if p.drive:  # also the WSL spelling of a Windows folder: /mnt/c/Users/...
+        rest = SEP.join(parts[1:])
+        body = rf"(?:{body}|/mnt/{re.escape(p.drive[0].lower())}/{rest})"
+    else:
+        body = SEP + body
+    return re.compile(rf"(?<![\w.]){body}(?={SEP}|$|[\s\"'<>)\],;])", re.I if p.drive else 0)
+
+
+def scrub_paths(node, run, home=None):
+    """Return a copy of node in which no local folder shows: a path under the run folder becomes run-relative,
+    a value that is a whole path under the home folder becomes its file name (so other folders and clients don't
+    show), and a home path inside other text becomes ~. Only these two exact folders are touched, so URLs,
+    API paths and words like /home/... in page text stay as they are."""
+    run_re = folder_re(run)
+    run_sub = re.compile(run_re.pattern + rf"({SEP})?", run_re.flags) if run_re else None
+    home_re = folder_re(home if home is not None else Path.home())
+
+    def fix(s):
+        if run_sub is not None:
+            s = run_sub.sub(lambda m: "" if m.group(1) else ".", s)
+        if home_re is not None and home_re.search(s):
+            m = home_re.match(s.strip())
+            if m:  # the whole value is a local path: keep only the file name
+                return re.split(SEP, s.strip())[-1] or "~"
+            s = home_re.sub("~", s)
+        return s
+
+    if isinstance(node, str):
+        return fix(node)
+    if isinstance(node, dict):
+        return {k: scrub_paths(v, run, home) for k, v in node.items()}
+    if isinstance(node, list):
+        return [scrub_paths(v, run, home) for v in node]
+    return node
 
 
 def walk_strings(node, path=""):
@@ -289,8 +337,11 @@ def load_verification(run, cutoff):
     low, high = report.get("interval_low"), report.get("interval_high")
     workstreams = {}
     for ws, row in (report.get("per_workstream") or {}).items():
-        workstreams[ws] = f"{row.get('label')} ({row.get('checked')} checked, {row.get('wrong')} wrong)"
-    return {
+        # The random-sample counts only where the workstream has some; a workstream checked only outside the
+        # sample carries its counts in its label, so "(0 checked, 0 wrong)" never sits beside them.
+        label = row.get("label")
+        workstreams[ws] = f"{label} ({row.get('checked')} in the random sample, {row.get('wrong')} wrong)" if row.get("checked") else label
+    out = {
         "label": report.get("label") or "partial: no report written",
         "claims_total": report.get("claims_total", len(read_jsonl(verify / "ledger.jsonl")) or None),
         "checked": len(verdicts) or None,
@@ -304,6 +355,91 @@ def load_verification(run, cutoff):
         "workstreams": workstreams,
         "cutoff": report.get("cutoff") or cutoff,
     }
+    left = left_out(run)
+    if left:
+        out["left_out"] = left
+    return out
+
+
+SCOPE_WORDS = {"gtm.lenses": "the go-to-market findings by lens", "gtm.impact": "the campaign impact study",
+               "ai.uses": "AI uses inside the company", "competition.compare": "rivals over time"}
+
+
+def left_out(run):
+    """Parts of the page the brief left out, in plain words: config.scope_out as locked at G1 (runstate.py), so the
+    page states what rubric_check excused. Entries added to config after G1 are not listed, since they aren't excused."""
+    asked = [str(x) for x in (read_json(run / "config.json") or {}).get("scope_out") or []]
+    lock = (read_json(run / "run.json") or {}).get("scope_out")
+    if isinstance(lock, dict):
+        asked = [x for x in asked if x in set(map(str, lock.get("items") or []))]
+    return [SCOPE_WORDS.get(x) or (f"{x.split('.', 1)[1].replace('_', ' ')} moves" if x.startswith("sowhat.") else x) for x in asked]
+
+
+# ---------------------------------------------------------------- client mode (references/client-mode.md)
+
+CLIENT_KINDS = {"Measured", "Public record", "One day's check"}
+REPORT_LINK = "{{report_link}}"
+FURTHER_PREFIX = "Where to look further:"
+
+
+def is_client(config):
+    return (config or {}).get("report_mode") == "client"
+
+
+def overview_top_from_onepager(onepager, old_top=None):
+    """In client mode the Overview top is the one-pager: same headline, same findings, same order."""
+    points = []
+    for f in onepager.get("findings") or []:
+        pt = {k: f.get(k) for k in ("so", "value", "viz", "label", "means", "kind", "reasoning", "claims") if f.get(k) is not None}
+        pt["trail"] = f.get("id")
+        points.append(pt)
+    top = {"headline": onepager.get("headline"), "points": points}
+    if (old_top or {}).get("doors"):
+        top["doors"] = old_top["doors"]
+    return top
+
+
+def cited_ids(item):
+    """Claim ids a finding or point rests on: its explicit list first, then any cited in its text, in order."""
+    out = list(item.get("claims") or [])
+    for key in ("value", "label", "means", "reasoning"):
+        out += CITE_RE.findall(str(item.get(key) or ""))
+    return list(dict.fromkeys(out))
+
+
+def build_trails(run, prose, cutoff):
+    """One evidence trail per one-pager finding and per tab-top point that cites anything."""
+    ledger = {r.get("id"): r for r in read_jsonl(run / "verify" / "ledger.jsonl")}
+    for path in run.glob("research/*/claims.jsonl"):
+        for r in read_jsonl(path):
+            ledger.setdefault(r.get("id"), r)
+    latest, confirmations = {}, {}
+    for r in read_jsonl(run / "verify" / "verdicts.jsonl"):
+        latest[r.get("id")] = r
+        if r.get("status") == "confirmed":
+            confirmations[r.get("id")] = confirmations.get(r.get("id"), 0) + 1
+
+    def claim(i):
+        row, v = ledger.get(i) or {}, latest.get(i) or {}
+        return {"id": i, "text": row.get("text") or row.get("title") or "", "source": row.get("source"),
+                "checked_url": v.get("checked_url"), "quote": v.get("evidence_quote"), "status": v.get("status", "unchecked"),
+                "confirmations": confirmations.get(i, 0), "basis": row.get("basis"), "read": v.get("checked_at") or cutoff}
+
+    def trail(item):
+        return {"title": item.get("so") or "", "value": item.get("value") or "", "reasoning": item.get("reasoning") or "",
+                "claims": [claim(i) for i in cited_ids(item)]}
+
+    trails = {}
+    for f in (prose.get("onepager") or {}).get("findings") or []:
+        trails[f.get("id")] = trail(f)
+    for tab, top in (prose.get("top") or {}).items():
+        if tab == "overview" and prose.get("onepager"):
+            continue
+        for i, pt in enumerate((top or {}).get("points") or []):
+            if cited_ids(pt):
+                pt["trail"] = f"{tab}.{i}"
+                trails[f"{tab}.{i}"] = trail(pt)
+    return trails
 
 
 def channel_of(row, channels):
@@ -347,9 +483,18 @@ def assemble(run):
     for r in gtm:
         r["row"] = channel_of(r, config.get("channels") or [])
 
+    client = is_client(config)
+    if client and prose.get("onepager"):
+        prose.setdefault("top", {})["overview"] = overview_top_from_onepager(prose["onepager"], (prose.get("top") or {}).get("overview"))
     cited = set()
     for _, text in list(walk_strings(prose)) + [("", r["md"]) for r in library]:
         cited.update(CITE_RE.findall(text))
+    if client:
+        for f in (prose.get("onepager") or {}).get("findings") or []:
+            cited.update(f.get("claims") or [])
+        for top in (prose.get("top") or {}).values():
+            for pt in (top or {}).get("points") or []:
+                cited.update(pt.get("claims") or [])
     claims = load_claims(run, events, metrics, gtm, cited)
     slim_metrics = [{k: r.get(k) for k in METRIC_FIELDS} for r in metrics]
 
@@ -387,6 +532,9 @@ def assemble(run):
         bundle_impact = None
     if bundle_impact:
         bundle["impact"] = bundle_impact
+    if client:
+        bundle["trails"] = build_trails(run, prose, cutoff)
+    bundle = scrub_paths(bundle, run)
     out = run / "dashboard" / "bundle.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(bundle, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -429,6 +577,7 @@ def check_text(node, where, problems):
 
 
 def check_tokens(text, where, bundle, problems):
+    text = text.replace(REPORT_LINK, "")  # filled at delivery, see references/client-mode.md
     stats = bundle.get("stats") or {}
     for kind, name in TOKEN_RE.findall(text):
         key = f"kpi:{name}" if kind == "kpi" else name
@@ -654,8 +803,10 @@ def validate_bundle(b):
         if s.get("kind") not in SO_WHAT_KINDS:
             problems.append(f"prose.so_what[{i}]: kind {s.get('kind')} is not one of {sorted(SO_WHAT_KINDS)}")
 
-    check_moves(prose, docs, cfg.get("market"), problems)
+    check_moves(prose, docs, cfg.get("market"), problems, client=is_client(cfg))
     check_insights(prose, cfg, b.get("impact"), problems)
+    if is_client(cfg):
+        check_client(prose, b, problems)
 
     # Size: the page is the bundle plus the template.
     template_size = sum(p.stat().st_size for p in TEMPLATE.iterdir() if p.is_file() and p.suffix in (".js", ".css", ".html"))
@@ -720,7 +871,60 @@ SOURCE_KINDS = {"Measured", "Public record", "Vendor estimate", "Assumed model",
 BAND_TABS = {"overview", "sowhat", "timeline", "gtm", "ai", "competition", "market", "deepdive"}
 
 
-def check_moves(prose, docs, market, problems):
+def check_client(prose, b, problems):
+    """Client mode: the one-pager, its trails, the Overview's further rows and each move's further line."""
+    op = prose.get("onepager")
+    if not op:
+        problems.append("prose.onepager is required in client mode")
+    else:
+        for key in ("headline", "basis", "way_in"):
+            if not op.get(key):
+                problems.append(f"prose.onepager.{key} is required")
+        if REPORT_LINK not in str(op.get("way_in") or ""):
+            problems.append(f"prose.onepager.way_in: include {REPORT_LINK}, filled with the report's address at delivery")
+        findings = op.get("findings") or []
+        if not 3 <= len(findings) <= 5:
+            problems.append(f"prose.onepager.findings: give 3 to 5, found {len(findings)}")
+        ids = [f.get("id") for f in findings]
+        for dup in {x for x in ids if ids.count(x) > 1}:
+            problems.append(f"prose.onepager.findings: duplicate id {dup}")
+        trails = b.get("trails") or {}
+        for i, f in enumerate(findings):
+            where = f"prose.onepager.findings[{i}]"
+            for key in ("id", "so", "value", "label", "means", "reasoning", "kind", "date"):
+                if not f.get(key):
+                    problems.append(f"{where}: {key} is required")
+            if f.get("kind") and f["kind"] not in CLIENT_KINDS:
+                problems.append(f"{where}: kind {f['kind']} is not one of {sorted(CLIENT_KINDS)}; estimates sit in the checking details")
+            if f.get("date") and not is_date(f["date"]):
+                problems.append(f"{where}: date {f['date']} is not YYYY-MM-DD")
+            for cid in f.get("claims") or []:
+                if cid not in (b.get("claims") or {}):
+                    problems.append(f"{where}: claim id {cid} is absent")
+            if not (trails.get(f.get("id")) or {}).get("claims"):
+                problems.append(f"{where}: the evidence trail has no claims; cite what the finding rests on")
+        ov = ((prose.get("top") or {}).get("overview") or {})
+        if ov.get("headline") != op.get("headline") or len(ov.get("points") or []) != len(findings):
+            problems.append("prose.top.overview must match prose.onepager; leave it to assemble in client mode")
+    for tab, top in (prose.get("top") or {}).items():
+        for i, pt in enumerate((top or {}).get("points") or []):
+            if not pt.get("reasoning"):
+                problems.append(f"prose.top.{tab}.points[{i}]: reasoning is required in client mode, for the evidence trail")
+    ov = prose.get("overview") or {}
+    if ov.get("connections"):
+        problems.append("prose.overview.connections: use prose.overview.further in client mode")
+    rows = (ov.get("further") or {}).get("rows") or []
+    if len(rows) < 5:
+        problems.append(f"prose.overview.further: give at least 5 rows of where to look further, found {len(rows)}")
+    for i, r in enumerate(rows):
+        if not r.get("source") or not r.get("clarifies"):
+            problems.append(f"prose.overview.further.rows[{i}]: source and clarifies are required")
+    for m in (prose.get("moves") or {}).get("items") or []:
+        if not str(m.get("further") or "").startswith(FURTHER_PREFIX):
+            problems.append(f"prose.moves.items {m.get('id')}: further must start with '{FURTHER_PREFIX}'")
+
+
+def check_moves(prose, docs, market, problems, client=False):
     """prose.moves is optional for older runs. When present, every move must be complete enough to act on."""
     for tab in prose.get("bands") or {}:
         if tab not in BAND_TABS:
@@ -771,7 +975,7 @@ def check_moves(prose, docs, market, problems):
             problems.append(f"prose.moves.headlines[{i}]: value, label and a kind from {sorted(SOURCE_KINDS)} are required")
     if not moves.get("rules"):
         problems.append("prose.moves.rules: give the if-then decision rules")
-    if not moves.get("data_request"):
+    if not moves.get("data_request") and not client:
         problems.append("prose.moves.data_request: list the internal data in one place")
     for path, text in walk_strings(moves, "prose.moves"):
         for phrase in PRESCRIPTIVE:
@@ -873,11 +1077,14 @@ def build(run):
         "/*__IMPACT__*/": script_safe(read("impact.js")),
         "/*__COMPARE__*/": script_safe(read("compare.js")),
         "/*__AI__*/": script_safe(read("ai.js")),
+        "/*__TRAIL__*/": script_safe(read("trail.js")),
         "/*__MOVES__*/": script_safe(read("moves.js")),
         "__TITLE__": title,
         "__BUNDLE__": embed_json(bundle),
     }
     html = read("index.html")
+    if is_client(bundle.get("config")):
+        html = checking_details_last(html)
     pattern = re.compile("|".join(re.escape(k) for k in parts))
     html = pattern.sub(lambda m: parts[m.group(0)], html)
     out = run / "dashboard" / "index.html"
@@ -891,14 +1098,96 @@ def build(run):
     return True
 
 
+def checking_details_last(html):
+    """Client mode: the reader meets findings first, so the checking details close the report (end of Deep dive)."""
+    m = re.search(r'\n[ \t]*<details class="tt-card tt-fold" id="trust">.*?</details>', html, re.S)
+    end = html.rfind("</section>", 0, html.find('<script id="bundle"'))
+    if not m or end < 0:
+        raise SystemExit("template: cannot find the trust section or the end of the last tab")
+    block = m.group(0).replace("How far to trust this", "How this report was checked")
+    html = html[:m.start()] + html[m.end():]
+    end = html.rfind("</section>", 0, html.find('<script id="bundle"'))  # where the last tab closes
+    return html[:end] + block.strip() + "\n  " + html[end:]
+
+
+def onepager_inline(text, claims, notes):
+    """Escape, keep **bold**, and turn [c:id] into a numbered link to the claim's source."""
+    import html as h
+    out = h.escape(str(text or ""), quote=False)
+    out = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", out)
+
+    def cite(m):
+        cid = m.group(1)
+        src = str((claims.get(cid) or {}).get("source") or "")
+        if cid not in notes:
+            notes[cid] = len(notes) + 1
+        n = notes[cid]
+        if src.startswith(("http://", "https://")):
+            return f'<sup><a href="{h.escape(src)}" title="Source">{n}</a></sup>'
+        return f"<sup>{n}</sup>"
+    return CITE_RE.sub(cite, out)
+
+
+def build_onepager(run, report_url=None):
+    """Client mode: write dashboard/onepager.html from the bundle. render_test.py prints it to PDF."""
+    import html as h
+    bundle = json.loads(bundle_path(run).read_text(encoding="utf-8"))
+    op = (bundle.get("prose") or {}).get("onepager")
+    if not op:
+        print("FAIL: prose.onepager is missing; the one-pager exists in client mode only")
+        return False
+    claims, notes = bundle.get("claims") or {}, {}
+    brand = (bundle.get("config") or {}).get("brand") or {}
+    link = report_url or "index.html"
+    rows = []
+    for f in op.get("findings") or []:
+        trail = f"{h.escape(link)}#trail={h.escape(str(f.get('id')))}"
+        rows.append(
+            '<article class="op-f">'
+            f'<div class="op-v">{onepager_inline(f.get("value"), claims, notes)}</div>'
+            '<div class="op-body">'
+            f'<h2>{onepager_inline(f.get("so"), claims, notes)}</h2>'
+            f'<p class="op-label">{onepager_inline(f.get("label"), claims, notes)}</p>'
+            f'<p class="op-means">{onepager_inline(f.get("means"), claims, notes)}</p>'
+            f'<a class="op-trail" href="{trail}">How we got here &rarr;</a>'
+            '</div></article>')
+    way_in = str(op.get("way_in") or "")
+    way_html = onepager_inline(way_in.replace(REPORT_LINK, "\x00"), claims, notes).replace(
+        "\x00", f'<a href="{h.escape(link)}">{h.escape(report_url) if report_url else "the full report"}</a>')
+    body = (
+        '<header class="op-head">'
+        f'<span class="op-brand">{h.escape(str(brand.get("name") or ""))}</span>'
+        f'<span class="op-meta">{h.escape(str(bundle["meta"].get("name") or ""))} &middot; {h.escape(str(bundle["meta"].get("cutoff") or ""))}</span>'
+        '</header>'
+        f'<h1>{onepager_inline(op.get("headline"), claims, notes)}</h1>'
+        f'<section class="op-list">{"".join(rows)}</section>'
+        '<footer class="op-foot">'
+        f'<p>{onepager_inline(op.get("basis"), claims, notes)}</p>'
+        f'<p class="op-way">{way_html}</p>'
+        + (f'<p class="op-sig">{h.escape(str(brand.get("footer")))}</p>' if brand.get("footer") else "")
+        + '</footer>')
+    title = re.sub(r"[<>&\"']", "", str(bundle["meta"].get("name") or "Report"))
+    page = (TEMPLATE / "onepager.html").read_text(encoding="utf-8").replace("__TITLE__", title).replace("<!--__BODY__-->", body)
+    if EM_DASH in page:
+        print("FAIL: em-dash character (U+2014) in the one-pager")
+        return False
+    out = run / "dashboard" / "onepager.html"
+    out.write_text(page, encoding="utf-8", newline="\n")
+    print(f"Wrote dashboard/onepager.html: {len(op.get('findings') or [])} findings, {len(notes)} sources")
+    return True
+
+
 def main(argv):
-    if len(argv) != 3 or argv[1] not in ("assemble", "validate", "build"):
+    if len(argv) < 3 or argv[1] not in ("assemble", "validate", "build", "onepager") or (len(argv) != 3 and argv[1] != "onepager"):
         print(__doc__)
         return 2
     run = Path(argv[2])
     if not run.is_dir():
         print(f"Not a folder: {run}")
         return 2
+    if argv[1] == "onepager":
+        url = argv[argv.index("--report-url") + 1] if "--report-url" in argv[3:-1] else None
+        return 0 if build_onepager(run, url) else 1
     if argv[1] == "assemble":
         assemble(run)
         return 0

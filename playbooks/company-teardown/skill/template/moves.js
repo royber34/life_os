@@ -14,6 +14,7 @@
   };
   const follow = (target) => {
     const [kind, value] = String(target).split(':');
+    if (kind === 'trail') { if (T.openTrail) T.openTrail(value); return; }
     if (kind === 'move') { T.goTo('sowhat'); setTimeout(() => T.jumpMove && T.jumpMove(value), 150); return; }
     if (kind === 'tab' || kind === 'doc') { T.goTo(kind === 'doc' ? target : value); return; }
     const tab = kind === 'part' ? 'ai' : value.split('/')[0];
@@ -98,6 +99,7 @@
       const foot = mk('div', 'tt-top-foot');
       if (t.kind) foot.append(mk('span', 'tt-tag', t.kind));
       if (t.goto) { const b = mk('button', 'tt-top-link', `${t.goto_label || 'See more'} →`); b.onclick = () => follow(t.goto); foot.append(b); }
+      if (t.trail && (B.trails || {})[t.trail]) { const b = mk('button', 'tt-top-link tt-trail-link', 'How we got here →'); b.onclick = () => T.openTrail(t.trail); foot.append(b); }
       c.append(foot);
       tiles.append(c);
     }
@@ -376,7 +378,7 @@
       body.append(shift);
     }
     if (m.found) {
-      for (const [label, text] of [['Found', m.found], ['Why it matters', m.matters], ['The idea', m.idea]]) {
+      for (const [label, text] of [['Found', m.found], ['Why it matters', m.matters], ['The idea', m.idea], ['Where to look further', m.further ? String(m.further).replace(/^Where to look further:\s*/, '') : null]].filter(([label, text]) => label !== 'Where to look further' || text)) {
         const p = mk('div', `tt-plain${label === 'The idea' ? ' is-idea' : ''}`);
         p.append(mk('span', 'tt-plain-label', label), mdInto('tt-prose', text));
         body.append(p);
@@ -462,6 +464,8 @@
   }));
   for (const f of document.querySelectorAll('[data-fold-count]')) {
     const n = f.dataset.foldCount.split('+').reduce((sum, key) => sum + (key === 'swot' ? Object.values(MOVES.swot || {}).reduce((a, v) => a + v.length, 0) : (MOVES[key] || []).length), 0);
+    const fold = f.closest('details');
+    if (n === 0 && fold) { fold.hidden = true; continue; }  // an empty fold hides itself
     f.append(document.createTextNode(` (${n})`));
   }
 })();
